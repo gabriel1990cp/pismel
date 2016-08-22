@@ -3,9 +3,9 @@
 require_once dirname(__FILE__) . '/MainOptions.php';
 require_once dirname(__FILE__) . '/LayerPresetOptions.php';
 
-//TODO: Make `layers` the new entity `MPSLLayer`
-
 class MPSLSlideOptions extends MPSLMainOptions {
+	const LAYER_WHITE_SPACE_CLASS_PREFIX = 'mpsl-white-space-';
+
     private $sliderId = null;
     private $sliderAlias = null;
     private $slideOrder = null;
@@ -13,15 +13,16 @@ class MPSLSlideOptions extends MPSLMainOptions {
     private $layerOptions = null;
     private $preview = false;
     private $edit = false;
+	/** @var MPSLSliderOptions $slider */
+    public $slider = null;
+	private $_slideRow = null;
 //    private $layerStyleOptions = null;
-	/*
-	 * @var $layerPresets MPSLLayerPresetOptions
-	 */
+	/** @var MPSLLayerPresetOptions $layerPresets */
     public $layerPresets = null;
 	private static $instance = null;
 
-	/*
-	 * @var (int) $id - Slider ID
+	/**
+	 * @var (int) $id - Slide ID
 	 * @var (boolean) $preview - Preview flag
 	 * @var (boolean) $edit - Edit or View slide flag (use with $preview = true)
 	 */
@@ -31,6 +32,8 @@ class MPSLSlideOptions extends MPSLMainOptions {
         $this->preview = $preview;
         $this->edit = $edit;
 
+	    $options = $this->load($id);
+
         $this->options = include($this->getSettingsPath());
         $this->prepareOptions($this->options);
 
@@ -39,16 +42,7 @@ class MPSLSlideOptions extends MPSLMainOptions {
 
 	    $this->layerPresets = MPSLLayerPresetOptions::getInstance($this->preview);
 
-        if (is_null($id)) {
-            $this->overrideOptions(null, false);
-        } else {
-            $loaded = $this->load($id);
-
-            if (!$loaded) {
-                // TODO: Throw error
-//                _e('Record not found', MPSL_TEXTDOMAIN);
-            }
-        }
+	    $this->prepare($options);
     }
 
 	public static function getInstance($id = null, $preview = false, $edit = false) {
@@ -59,25 +53,50 @@ class MPSLSlideOptions extends MPSLMainOptions {
 	}
 
     protected function load($id) {
-        global $wpdb;
+		$options = false;
 
-        $result = $wpdb->get_row(sprintf(
-            'SELECT * FROM %s WHERE id = %d',
-            $wpdb->prefix . ($this->preview && !$this->edit ? parent::SLIDES_PREVIEW_TABLE : parent::SLIDES_TABLE),
-            (int) $id
-        ), ARRAY_A);
+	    if (!is_null($id)) {
+		    if (is_null($this->_slideRow)) {
 
-        if (is_null($result)) return false;
+			    global $wpdb;
+			    $this->_slideRow = $wpdb->get_row(sprintf(
+				    'SELECT * FROM %s WHERE id = %d',
+				    $wpdb->prefix . ($this->preview && !$this->edit ? parent::SLIDES_PREVIEW_TABLE : parent::SLIDES_TABLE),
+				    (int)$id
+			    ), ARRAY_A);
+		    }
 
-        $this->id = (int) $id;
-        $this->sliderId = (int) $result['slider_id'];
-        $this->sliderAlias = MPSLSliderOptions::getAliasById($this->sliderId);
-        $this->slideOrder = (int) $result['slide_order'];
-        $this->overrideOptions(json_decode($result['options'], true), false);
-        $this->overrideLayers(json_decode($result['layers'], true));
+		    if (!is_null($this->_slideRow)) {
+//			    if (is_null($result)) return false;
 
-        return true;
+			    $this->id = (int)$id;
+			    $this->sliderId = (int)$this->_slideRow['slider_id'];
+			    $this->sliderAlias = MPSLSliderOptions::getAliasById($this->sliderId);
+			    $this->slideOrder = (int)$this->_slideRow['slide_order'];
+
+//			    $this->overrideOptions(json_decode($result['options'], true), false);
+//			    $this->overrideLayers(json_decode($result['layers'], true));
+			    $options = array(
+				    'slide' => json_decode($this->_slideRow['options'], true),
+				    'layers' => json_decode($this->_slideRow['layers'], true)
+			    );
+
+			    $this->loadSlider();
+		    }
+	    }
+
+        return $options;
     }
+
+	protected function prepare($options) {
+		if ($options) {
+			$this->overrideOptions($options['slide'], false);
+			$this->overrideLayers($options['layers']);
+
+		} else {
+			$this->overrideOptions(false, false);
+		}
+	}
 
     public function overrideLayers($layers = null) {
         $defaults = $this->getDefaults($this->layerOptions);
@@ -106,7 +125,7 @@ class MPSLSlideOptions extends MPSLMainOptions {
         $this->layers = $layers;
     }
 
-    public function overrideOptions($options = null, $isGrouped = true) {
+    public function overrideOptions($options = false, $isGrouped = true) {
         if (isset($options['bg_image_id']) && !empty($options['bg_image_id'])) {
             $image_url = wp_get_attachment_url($options['bg_image_id']);
             if (false === $image_url) {
@@ -117,7 +136,7 @@ class MPSLSlideOptions extends MPSLMainOptions {
         parent::overrideOptions($options, $isGrouped);
     }
 
-    public function create($sliderId = null) {
+    public function create($sliderId = null, $silent = false) {
         global $wpdb;
 
         // Update options with new data
@@ -139,15 +158,27 @@ class MPSLSlideOptions extends MPSLMainOptions {
         // Exec query
         $wpdb->hide_errors();
         $result = $wpdb->insert($qTable, $qData, $qFormats);
-        if ($result === false) {
-            mpslSetError(__('Slide is not created. Error: ', MPSL_TEXTDOMAIN) . $wpdb->last_error);
-        }
-        $id = ($result) ? $wpdb->insert_id : null;
-        $this->id = (int) $id;
-        $this->setGeneratedByIdTitle();
-        $this->update();
 
-        wp_send_json(array('result' => $result, 'id' => $id));
+        if ($result !== false) {
+	        $id = ($result) ? $wpdb->insert_id : null;
+            $this->id = (int) $id;
+
+	        if (!$silent) {
+		        $this->_slideRow = $qData;
+		        $this->_slideRow['id'] = $this->id;
+		        self::__construct($id);
+	        }
+
+	        $this->setGeneratedByIdTitle();
+            $this->update();
+
+            return $this->id;
+
+        } else {
+            return false;
+        }
+
+
     }
 
     public function prepareLayersForImport(&$layers, $presetClasses = array()) {
@@ -218,6 +249,7 @@ class MPSLSlideOptions extends MPSLMainOptions {
 
 		    $layer['private_styles'] = $this->layerPresets->clearPreset($layer['private_styles']);
 	    }
+        $this->clearLayerOptions();
 	    // Set used fonts
 	    $options['fonts'] = MPSLLayerPresetOptions::fontsUnique($fonts);
 
@@ -254,6 +286,31 @@ class MPSLSlideOptions extends MPSLMainOptions {
 //        }
     }
 
+    /** @todo: Test and fix */
+    private function clearLayerOptions() {
+        foreach ($this->layerOptions as &$group) {
+            foreach ($group['options'] as $optKey => $option) {
+                $skip = isset($option['skip']) && $option['skip'];
+                $skipChild = isset($option['skipChild']) && $option['skipChild'];
+                if ($skip || $skipChild) {
+                    if ($skipChild) $optsToSkip = array_keys($option['options']);
+                    foreach ($this->layers as &$layer) {
+                        if ($skip && array_key_exists($optKey, $layer)) {
+                            unset($layer[$optKey]);
+                        }
+                        if ($skipChild) {
+                            foreach ($optsToSkip as $optToSkip) {
+                                if (array_key_exists($optToSkip, $layer)) {
+                                    unset($layer[$optToSkip]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public function delete() {
         global $wpdb;
         $wpdb->hide_errors();
@@ -271,7 +328,7 @@ class MPSLSlideOptions extends MPSLMainOptions {
 
         $slide = $db->getSlide($slideId, array('slider_id', 'slide_order', 'options', 'layers'));
         if (is_null($slide)) {
-            mpslSetError(__('Slide ID is not set.', MPSL_TEXTDOMAIN));
+            mpslSetError(__('Slide ID is not set.', 'motopress-slider'));
         }
         $order = $wpdb->get_var(sprintf(
             "SELECT MAX(slide_order) FROM %s WHERE slider_id=%d",
@@ -285,7 +342,7 @@ class MPSLSlideOptions extends MPSLMainOptions {
         $layers = json_decode($slide['layers'], true);
 
         if ($options !== false && isset($options['title'])) {
-            if (is_null($sliderId)) $options['title'] = __('Duplicate of ', MPSL_TEXTDOMAIN) . $options['title'];
+            if (is_null($sliderId)) $options['title'] = __('Duplicate of ', 'motopress-slider') . $options['title'];
             $slide['options'] = json_encode($options);
 
 	        // Prepare layers
@@ -330,13 +387,16 @@ class MPSLSlideOptions extends MPSLMainOptions {
 
     public function render() {
         global $mpsl_settings;
-        $options = $this->getOptions(true);
-        include $this->getViewPath();
+        if (!is_plugin_active('woocommerce/woocommerce.php')  && $this->slider->getSliderType() === 'woocommerce') {
+            include($this->pluginDir . 'views/woocommerce-not-found.php');
+        } else {
+            $options = $this->getOptions(true);
+            include $this->getViewPath();
+        }
     }
 
     public function renderLayer() {
         global $mpsl_settings;
-        $slider = new MPSLSliderOptions($this->id);
         include($this->getViewPath('layer'));
     }
 
@@ -471,4 +531,210 @@ class MPSLSlideOptions extends MPSLMainOptions {
 		}
 		return array_unique($classes);
 	}
+
+    private function loadSlider() {
+        if (!$this->slider) {
+            $this->slider = new MPSLSliderOptions((int) $this->sliderId);
+        }
+
+        return $this->slider;
+    }
+
+	public function getSliderType() {
+		return $this->slider ? $this->slider->getSliderType() : MPSLMainOptions::DEFAULT_SLIDER_TYPE;
+	}
+
+    private function getStartOptionByType($type, $isCloned = false) {
+        $result = array();
+
+        if($type === 'duration') {
+            $result = array(
+                'type' => 'number',
+                'label2' => __('duration (ms): ', 'motopress-slider'),
+                'default' => 1000,
+                'min' => 0
+            );
+
+            if($isCloned) {
+                $result['label2'] = __('Duration: ', 'motopress-slider');
+                $result['helpers'] = array('start_duration');
+            }
+        } else if ($type === 'easings'){
+            $result =  array(
+                'type' => 'select',
+                'label2' => __('Easing :', 'motopress-slider'),
+                'default' => 'linear',
+                'list' => array(
+                    'linear' => __('linear', 'motopress-slider'),
+                    'ease' => __('ease', 'motopress-slider'),
+                    'easeIn' => __('easeIn', 'motopress-slider'),
+                    'easeInOut' => __('easeInOut', 'motopress-slider'),
+                    'easeInQuad' => __('easeInQuad', 'motopress-slider'),
+                    'easeInCubic' => __('easeInCubic', 'motopress-slider'),
+                    'easeInQuart' => __('easeInQuart', 'motopress-slider'),
+                    'easeInQuint' => __('easeInQuint', 'motopress-slider'),
+                    'easeInSine' => __('easeInSine', 'motopress-slider'),
+                    'easeInExpo' => __('easeInExpo', 'motopress-slider'),
+                    'easeInCirc' => __('easeInCirc', 'motopress-slider'),
+                    'easeInBack' => __('easeInBack', 'motopress-slider'),
+                    'easeInOutQuad' => __('easeInOutQuad', 'motopress-slider'),
+                    'easeInOutCubic' => __('easeInOutCubic', 'motopress-slider'),
+                    'easeInOutQuart' => __('easeInOutQuart', 'motopress-slider'),
+                    'easeInOutQuint' => __('easeInOutQuint', 'motopress-slider'),
+                    'easeInOutSine' => __('easeInOutSine', 'motopress-slider'),
+                    'easeInOutExpo' => __('easeInOutExpo', 'motopress-slider'),
+                    'easeInOutCirc' => __('easeInOutCirc', 'motopress-slider'),
+                    'easeInOutBack' => __('easeInOutBack', 'motopress-slider'),
+                )
+            );
+            if($isCloned) {
+                $result['label2'] = __('Ease function: ', 'motopress-slider');
+                $result['helpers'] = array('start_timing_function');
+            }
+        } else {
+            $result =  array(
+                'type' => 'select',
+                'label2' => __('Start Animation :', 'motopress-slider'),
+                'default' => 'fadeIn',
+                'list' => array(
+                    'bounceIn' => __('bounceIn', 'motopress-slider'),
+                    'bounceInDown' => __('bounceInDown', 'motopress-slider'),
+                    'bounceInLeft' => __('bounceInLeft', 'motopress-slider'),
+                    'bounceInRight' => __('bounceInRight', 'motopress-slider'),
+                    'bounceInUp' => __('bounceInUp', 'motopress-slider'),
+                    'fadeIn' => __('fadeIn', 'motopress-slider'),
+                    'fadeInDown' => __('fadeInDown', 'motopress-slider'),
+                    'fadeInDownBig' => __('fadeInDownBig', 'motopress-slider'),
+                    'fadeInLeft' => __('fadeInLeft', 'motopress-slider'),
+                    'fadeInLeftBig' => __('fadeInLeftBig', 'motopress-slider'),
+                    'fadeInRight' => __('fadeInRight', 'motopress-slider'),
+                    'fadeInRightBig' => __('fadeInRightBig', 'motopress-slider'),
+                    'fadeInUp' => __('fadeInUp', 'motopress-slider'),
+                    'fadeInUpBig' => __('fadeInUpBig', 'motopress-slider'),
+                    'flip' => __('flip', 'motopress-slider'),
+                    'flipInX' => __('flipInX', 'motopress-slider'),
+                    'flipInY' => __('flipInY', 'motopress-slider'),
+                    'lightSpeedIn' => __('lightSpeedIn', 'motopress-slider'),
+                    'rotateIn' => __('rotateIn', 'motopress-slider'),
+                    'rotateInDownLeft' => __('rotateInDownLeft', 'motopress-slider'),
+                    'rotateInDownRight' => __('rotateInDownRight', 'motopress-slider'),
+                    'rotateInUpLeft' => __('rotateInUpLeft', 'motopress-slider'),
+                    'rotateInUpRight' => __('rotateInUpRight', 'motopress-slider'),
+                    'rollIn' => __('rollIn', 'motopress-slider'),
+                    'zoomIn' => __('zoomIn', 'motopress-slider'),
+                    'zoomInDown' => __('zoomInDown', 'motopress-slider'),
+                    'zoomInLeft' => __('zoomInLeft', 'motopress-slider'),
+                    'zoomInRight' => __('zoomInRight', 'motopress-slider'),
+                    'zoomInUp' => __('zoomInUp', 'motopress-slider')
+                )
+            );
+            if($isCloned) {
+                unset($result['label2']);
+                $result['type'] = 'pretty_select';
+                $result['helpers'] = array('start_animation');
+            }
+        }
+
+        return $result;
+    }
+
+    private function getEndOptionByType($type, $isCloned = false) {
+
+        $result = array();
+
+        if($type === 'duration') {
+            $result = array(
+                'type' => 'number',
+                'label2' => __('duration (ms): ', 'motopress-slider'),
+                'default' => 1000,
+                'min' => 0
+            );
+
+            if ($isCloned) {
+                $result['label2'] = __('Duration: ', 'motopress-slider');
+                $result['helpers'] = array('end_duration');
+            }
+        } else if ($type === 'easings'){
+            $result = array(
+                'type' => 'select',
+                'label2' => __('Easing :', 'motopress-slider'),
+                'default' => 'linear',
+                'list' => array(
+                    'linear' => __('linear', 'motopress-slider'),
+                    'ease' => __('ease', 'motopress-slider'),
+                    'easeOutQuad' => __('easeOutQuad', 'motopress-slider'),
+                    'easeOutCubic' => __('easeOutCubic', 'motopress-slider'),
+                    'easeOutQuart' => __('easeOutQuart', 'motopress-slider'),
+                    'easeOutQuint' => __('easeOutQuint', 'motopress-slider'),
+                    'easeOutSine' => __('easeOutSine', 'motopress-slider'),
+                    'easeOutExpo' => __('easeOutExpo', 'motopress-slider'),
+                    'easeOutCirc' => __('easeOutCirc', 'motopress-slider'),
+                    'easeOutBack' => __('easeOutBack', 'motopress-slider'),
+                    'easeInOutQuad' => __('easeInOutQuad', 'motopress-slider'),
+                    'easeInOutCubic' => __('easeInOutCubic', 'motopress-slider'),
+                    'easeInOutQuart' => __('easeInOutQuart', 'motopress-slider'),
+                    'easeInOutQuint' => __('easeInOutQuint', 'motopress-slider'),
+                    'easeInOutSine' => __('easeInOutSine', 'motopress-slider'),
+                    'easeInOutExpo' => __('easeInOutExpo', 'motopress-slider'),
+                    'easeInOutCirc' => __('easeInOutCirc', 'motopress-slider'),
+                    'easeInOutBack' => __('easeInOutBack', 'motopress-slider'),
+                )
+            );
+
+            if ($isCloned) {
+                $result['label2'] = __('Ease function: ', 'motopress-slider');
+                $result['helpers'] = array('end_timing_function');
+            }
+        } else {
+            $result =  array(
+                'type' => 'select',
+                'label2' => __('End Animation :', 'motopress-slider'),
+                'default' => 'auto',
+                'list' => array(
+                    'auto' => __('auto', 'motopress-slider'),
+                    'bounceOut' => __('bounceOut', 'motopress-slider'),
+                    'bounceOutDown' => __('bounceOutDown', 'motopress-slider'),
+                    'bounceOutLeft' => __('bounceOutLeft', 'motopress-slider'),
+                    'bounceOutRight' => __('bounceOutRight', 'motopress-slider'),
+                    'bounceOutUp' => __('bounceOutUp', 'motopress-slider'),
+                    'fadeOut' => __('fadeOut', 'motopress-slider'),
+                    'fadeOutDown' => __('fadeOutDown', 'motopress-slider'),
+                    'fadeOutDownBig' => __('fadeOutDownBig', 'motopress-slider'),
+                    'fadeOutLeft' => __('fadeOutLeft', 'motopress-slider'),
+                    'fadeOutLeftBig' => __('fadeOutLeftBig', 'motopress-slider'),
+                    'fadeOutRight' => __('fadeOutRight', 'motopress-slider'),
+                    'fadeOutUp' => __('fadeOutUp', 'motopress-slider'),
+                    'fadeOutUpBig' => __('fadeOutUpBig', 'motopress-slider'),
+                    'flip' => __('flip', 'motopress-slider'),
+                    'flipOutX' => __('flipOutX', 'motopress-slider'),
+                    'flipOutY' => __('flipOutY', 'motopress-slider'),
+                    'lightSpeedOut' => __('lightSpeedOut', 'motopress-slider'),
+                    'rotateOut' => __('rotateOut', 'motopress-slider'),
+                    'rotateOutDownLeft' => __('rotateOutDownLeft', 'motopress-slider'),
+                    'rotateOutDownRight' => __('rotateOutDownRight', 'motopress-slider'),
+                    'rotateOutUpLeft' => __('rotateOutUpLeft', 'motopress-slider'),
+                    'rotateOutUpRight' => __('rotateOutUpRight', 'motopress-slider'),
+                    'rollOut' => __('rollOut', 'motopress-slider'),
+                    'zoomOut' => __('zoomOut', 'motopress-slider'),
+                    'zoomOutDown' => __('zoomOutDown', 'motopress-slider'),
+                    'zoomOutLeft' => __('zoomOutLeft', 'motopress-slider'),
+                    'zoomOutRight' => __('zoomOutRight', 'motopress-slider'),
+                    'zoomOutUp' => __('zoomOutUp', 'motopress-slider')
+                ),
+                'helpers' => array('start_animation')
+            );
+
+            if ($isCloned) {
+                unset($result['label2']);
+                $result['type'] = 'pretty_select';
+                $result['helpers'] = array('end_animation');
+            }
+        }
+        return $result;
+    }
+
+    public function getOptionsByType($statusType, $type, $isCloned) {
+        return $statusType === 'start'  ? $this->getStartOptionByType($type, $isCloned) : $this->getEndOptionByType($type, $isCloned);
+    }
+
 }

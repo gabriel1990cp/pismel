@@ -3,7 +3,7 @@ Contributors: MotoPress
 Donate link: http://www.getmotopress.com/
 Tags: slider, image slider, responsive slider, responsive slides, responsive slideshows, slideshow, seo, seo-optimized, wordpress slider, wordpress slideshow, content slider, video slider, free slider, video slider, video backgrounds, vimeo slider, youtube slider, drag and drop slider, wp slider, layer, animation, transitions, slider plugin, swipe effect, swipe navigation, touch swipe, mouse swipe, motopress
 Requires at least: 3.6
-Tested up to: 4.3
+Tested up to: 4.5
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -19,7 +19,7 @@ Responsive WordPress Slider by MotoPress is an easy to use solution to build bea
 * [MotoPress Slider plugin](http://www.getmotopress.com/plugins/slider/)
 * [Documentation](http://www.getmotopress.com/documentation/wordpress/plugins/slider/)
 * [Forums](http://www.getmotopress.com/forums/forum/wordpress/plugins/slider/)
-* [Slider Demo](http://demo.getmotopress.com/wp-admin/)
+* [Slider Demo](http://mpsldemo.getmotopress.com/#motopress-try-demo)
 
 = Core MotoPress Slider Features: =
 

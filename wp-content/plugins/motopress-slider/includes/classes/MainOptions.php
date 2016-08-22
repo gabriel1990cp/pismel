@@ -7,6 +7,7 @@ abstract class MPSLMainOptions extends MPSLOptions {
     const SLIDES_TABLE = 'mpsl_slides';
     const SLIDES_PREVIEW_TABLE = 'mpsl_slides_preview';
     const SLIDERS_PREVIEW_TABLE = 'mpsl_sliders_preview';
+    const DEFAULT_SLIDER_TYPE = 'custom';
 
     protected $id = null;
 //    protected $optionValues = array();
@@ -18,7 +19,7 @@ abstract class MPSLMainOptions extends MPSLOptions {
 
     abstract public function getAttributes();
 
-    protected function updateOption($group, $name, $value) {
+    public function updateOption($group, $name, $value) {
         if (array_key_exists($name, $this->options[$group]['options'])) {
             $this->options[$group]['options'][$name]['value'] = $value;
         }
@@ -26,12 +27,14 @@ abstract class MPSLMainOptions extends MPSLOptions {
 
     abstract protected function load($id);
 
+//    abstract protected function prepare($options);
+
     /**
-     * @param array | null $options - Options
+     * @param array | boolean $options - Options
      * @param bool $isGrouped - Is data grouped ?
      */
-    public function overrideOptions($options = null, $isGrouped = true) {
-        $existingOptions = is_null($options) ? null : $options;
+    public function overrideOptions($options = false, $isGrouped = true) {
+        $existingOptions = is_array($options) && $options ? $options : null;
         foreach ($this->options as $grpName => $grp) {
             foreach ($grp['options'] as $optName => $opt) {
                 if (is_null($existingOptions)) {
@@ -49,6 +52,16 @@ abstract class MPSLMainOptions extends MPSLOptions {
         }
 
 //	    $this->extractOptionValues();
+    }
+
+    protected function ungroupOptions($options = false) {
+	    $_options = array();
+        if (is_array($options)) {
+	        foreach ($options as $grpName => $grpOptions) {
+		        $_options = array_merge($_options, $grpOptions);
+	        }
+        }
+	    return $_options;
     }
 
     public function getGroupAttr($name, $attr) {

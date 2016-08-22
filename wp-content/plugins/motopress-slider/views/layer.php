@@ -2,7 +2,7 @@
 <div class="mpsl-layer-settings-wrapper mpsl_layers_wrapper">
     <table class="table widefat">
         <thead>
-            <th colspan="3"><?php _e('Layer Settings', MPSL_TEXTDOMAIN);?></th>
+            <th colspan="3"><?php _e('Layer Settings', 'motopress-slider');?></th>
         </thead>
         <tbody>
             <?php $generalLayerOptions = $this->layerOptions['general']['options'];?>
@@ -25,6 +25,15 @@
                         <?php MPSLOptionsFactory::addControl($generalLayerOptions['width']); ?>
                     </div>
                     <div class="mpsl-option-wrapper">
+                        <?php MPSLOptionsFactory::addControl($generalLayerOptions['html_width']); ?>
+                    </div>
+                    <div class="mpsl-option-wrapper">
+	                    <div class="label-wrapper">
+                            <?php MPSLOptionsFactory::addLabel($generalLayerOptions['white-space']); ?>
+                        </div>
+                        <?php MPSLOptionsFactory::addControl($generalLayerOptions['white-space']); ?>
+                    </div>
+                    <div class="mpsl-option-wrapper">
                         <?php MPSLOptionsFactory::addControl($generalLayerOptions['video_width']); ?>
                     </div>
                     <div class="mpsl-option-wrapper">
@@ -32,19 +41,29 @@
                     </div>
                 </td>
                 <td class="animation" width="280">
-                    <div class="mpsl-option-wrapper mpsl-animation-wrapper">
-                        <?php MPSLOptionsFactory::addControl($generalLayerOptions['start_animation']); ?>
-                        <div class="mpsl-easing-duration-wrapper">
-                            <?php MPSLOptionsFactory::addControl($generalLayerOptions['start_timing_function']); ?>
-                            <?php MPSLOptionsFactory::addControl($generalLayerOptions['start_duration']); ?>
+                    <div class="mpsl-group-animation-wrappers">
+                        <div class="mpsl-option-wrapper mpsl-animation-wrapper">
+                            <?php MPSLOptionsFactory::addControl($generalLayerOptions['start_animation']); ?>
+                            <div class="mpsl-easing-duration-wrapper">
+                                <?php MPSLOptionsFactory::addControl($generalLayerOptions['start_timing_function']); ?>
+                                <?php MPSLOptionsFactory::addControl($generalLayerOptions['start_duration']); ?>
+                            </div>
+                        </div>
+
+                        <div class="mpsl-option-wrapper ">
+                            <?php MPSLOptionsFactory::addControl($generalLayerOptions['start_animation_group']); ?>
                         </div>
                     </div>
-
-                    <div class="mpsl-option-wrapper mpsl-animation-wrapper">
-                        <?php MPSLOptionsFactory::addControl($generalLayerOptions['end_animation']); ?>
-                        <div class="mpsl-easing-duration-wrapper">
-                            <?php MPSLOptionsFactory::addControl($generalLayerOptions['end_timing_function']); ?>
-                            <?php MPSLOptionsFactory::addControl($generalLayerOptions['end_duration']); ?>
+                    <div class="mpsl-group-animation-wrappers">
+                        <div class="mpsl-option-wrapper mpsl-animation-wrapper">
+                            <?php MPSLOptionsFactory::addControl($generalLayerOptions['end_animation']); ?>
+                            <div class="mpsl-easing-duration-wrapper">
+                                <?php MPSLOptionsFactory::addControl($generalLayerOptions['end_timing_function']); ?>
+                                <?php MPSLOptionsFactory::addControl($generalLayerOptions['end_duration']); ?>
+                            </div>
+                        </div>
+                        <div class="mpsl-option-wrapper ">
+                            <?php MPSLOptionsFactory::addControl($generalLayerOptions['end_animation_group']); ?>
                         </div>
                     </div>
                     <div class="mpsl-option-wrapper">
@@ -55,7 +74,7 @@
                     </div>
                     <div class="mpsl-option-wrapper">
                         <div class="mpsl-duration-info">
-                            <?php echo "Slide duration (ms): " . $slider->options['main']['options']['slider_delay']['value']; ?>
+                            <?php echo "Slide duration (ms): " . $this->slider->options['main']['options']['slider_delay']['value']; ?>
                         </div>
                     </div>
                 </td>
@@ -78,6 +97,14 @@
                         </div>
                         <?php MPSLOptionsFactory::addControl($generalLayerOptions['button_link']); ?>
                     </div>
+                    <?php if(isset($generalLayerOptions['button_autolink'])){?>
+	                <div class="mpsl-option-wrapper">
+<!--                        <div class="label-wrapper">-->
+<!--                            --><?php //MPSLOptionsFactory::addLabel($generalLayerOptions['button_autolink']); ?>
+<!--                        </div>-->
+                        <?php MPSLOptionsFactory::addControl($generalLayerOptions['button_autolink']); ?>
+                    </div>
+                    <?php }?>
                     <div class="mpsl-option-wrapper">
                         <?php MPSLOptionsFactory::addControl($generalLayerOptions['button_target']); ?>
                     </div>
@@ -120,28 +147,28 @@
                         <?php MPSLOptionsFactory::addControl($generalLayerOptions['video_preview_image']); ?>
                     </div>
                     <div class="mpsl-option-wrapper">
-                        <?php MPSLOptionsFactory::addLabel($generalLayerOptions['video_autoplay']); ?>
                         <?php MPSLOptionsFactory::addControl($generalLayerOptions['video_autoplay']); ?>
+						<?php MPSLOptionsFactory::addLabel($generalLayerOptions['video_autoplay']); ?>
                     </div>
                     <div class="mpsl-option-wrapper">
-                        <?php MPSLOptionsFactory::addLabel($generalLayerOptions['video_loop']); ?>
-                        <?php MPSLOptionsFactory::addControl($generalLayerOptions['video_loop']); ?>
+						<?php MPSLOptionsFactory::addControl($generalLayerOptions['video_loop']); ?>
+						<?php MPSLOptionsFactory::addLabel($generalLayerOptions['video_loop']); ?>
                     </div>
                     <div class="mpsl-option-wrapper">
-                        <?php MPSLOptionsFactory::addLabel($generalLayerOptions['video_mute']); ?>
                         <?php MPSLOptionsFactory::addControl($generalLayerOptions['video_mute']); ?>
+						<?php MPSLOptionsFactory::addLabel($generalLayerOptions['video_mute']); ?>
                     </div>
                     <div class="mpsl-option-wrapper">
-                        <?php MPSLOptionsFactory::addLabel($generalLayerOptions['video_html_hide_controls']); ?>
                         <?php MPSLOptionsFactory::addControl($generalLayerOptions['video_html_hide_controls']); ?>
+						<?php MPSLOptionsFactory::addLabel($generalLayerOptions['video_html_hide_controls']); ?>
                     </div>
                     <div class="mpsl-option-wrapper">
-                        <?php MPSLOptionsFactory::addLabel($generalLayerOptions['video_youtube_hide_controls']); ?>
                         <?php MPSLOptionsFactory::addControl($generalLayerOptions['video_youtube_hide_controls']); ?>
+						<?php MPSLOptionsFactory::addLabel($generalLayerOptions['video_youtube_hide_controls']); ?>
                     </div>
                     <div class="mpsl-option-wrapper">
-                        <?php MPSLOptionsFactory::addLabel($generalLayerOptions['video_disable_mobile']); ?>
                         <?php MPSLOptionsFactory::addControl($generalLayerOptions['video_disable_mobile']); ?>
+						<?php MPSLOptionsFactory::addLabel($generalLayerOptions['video_disable_mobile']); ?>
                     </div>
 	                <div class="mpsl-option-wrapper">
                         <div class="label-wrapper">
@@ -149,10 +176,14 @@
                         </div>
                         <?php MPSLOptionsFactory::addControl($generalLayerOptions['image_link']); ?>
                     </div>
+                    <?php if(isset($generalLayerOptions['image_autolink'])){ ?>
                     <div class="mpsl-option-wrapper">
+                        <?php MPSLOptionsFactory::addControl($generalLayerOptions['image_autolink']); ?>
+                    </div>
+                    <?php }?>
+					<div class="mpsl-option-wrapper">
                         <?php MPSLOptionsFactory::addControl($generalLayerOptions['image_target']); ?>
                     </div>
-
 	                <div class="mpsl-option-wrapper mpsl-option-wrapper-preset">
                         <?php MPSLOptionsFactory::addControl($generalLayerOptions['preset']); ?>
                     </div>
@@ -195,7 +226,7 @@
     <table class="widefat mpsl-layers-table-head">
         <thead>
         <tr>
-            <th colspan="2"><?php _e('Layers Sorting (drag to set an order)', MPSL_TEXTDOMAIN); ?></th>
+            <th colspan="2"><?php _e('Layers Sorting (drag to set an order)', 'motopress-slider'); ?></th>
         </tr>
         </thead>
     </table>

@@ -1,7 +1,10 @@
 <?php
-return array(
+/** @var MPSLSlideOptions $this */
+$sliderType = $this->getSliderType();
+
+$result =  array(
     'general' => array(
-        'title' => __('Layer General Parameters', MPSL_TEXTDOMAIN),
+        'title' => __('Layer General Parameters', 'motopress-slider'),
         'icon' => null,
         'description' => '',
         'options' => array(
@@ -28,19 +31,19 @@ return array(
 //            ),
 //            'style' => array(
 //                'type' => 'select',
-//                'label' => __('Style', MPSL_TEXTDOMAIN),
-//                'description' => __('Choose style', MPSL_TEXTDOMAIN),
+//                'label' => __('Style', 'motopress-slider'),
+//                'description' => __('Choose style', 'motopress-slider'),
 //                'default' => 'green',
 //                'disabled' => false,
 //                'list' => array(
-//                    'red' => __('Red', MPSL_TEXTDOMAIN),
-//                    'blue' => __('Blue', MPSL_TEXTDOMAIN),
-//                    'green' => __('Green', MPSL_TEXTDOMAIN),
+//                    'red' => __('Red', 'motopress-slider'),
+//                    'blue' => __('Blue', 'motopress-slider'),
+//                    'green' => __('Green', 'motopress-slider'),
 //                )
 //            ),
 //            'alt' => array(
 //                'type' => 'text',
-//                'label' => __('Alt Text', MPSL_TEXTDOMAIN),
+//                'label' => __('Alt Text', 'motopress-slider'),
 //                'default' => '',
 //                'dependency' => array(
 //                    'parameter' => 'style',
@@ -66,169 +69,70 @@ return array(
                     'offset_x' => array(
                         'type' => 'number',
                         'default' => 0,
-                        'label2' => __('X:', MPSL_TEXTDOMAIN)
+                        'label2' => __('X:', 'motopress-slider')
                     ),
                     'offset_y' => array(
                         'type' => 'number',
                         'default' => 0,
-                        'label2' => __('Y:', MPSL_TEXTDOMAIN)
+                        'label2' => __('Y:', 'motopress-slider')
                     )
                 )
             ),
 
-            'start_animation' => array(
-                'type' => 'select',
-                'label2' => __('Start Animation :', MPSL_TEXTDOMAIN),
-                'default' => 'fadeIn',
-                'list' => array(
-                    'bounceIn' => __('bounceIn', MPSL_TEXTDOMAIN),
-                    'bounceInDown' => __('bounceInDown', MPSL_TEXTDOMAIN),
-                    'bounceInLeft' => __('bounceInLeft', MPSL_TEXTDOMAIN),
-                    'bounceInRight' => __('bounceInRight', MPSL_TEXTDOMAIN),
-                    'bounceInUp' => __('bounceInUp', MPSL_TEXTDOMAIN),
-                    'fadeIn' => __('fadeIn', MPSL_TEXTDOMAIN),
-                    'fadeInDown' => __('fadeInDown', MPSL_TEXTDOMAIN),
-                    'fadeInDownBig' => __('fadeInDownBig', MPSL_TEXTDOMAIN),
-                    'fadeInLeft' => __('fadeInLeft', MPSL_TEXTDOMAIN),
-                    'fadeInLeftBig' => __('fadeInLeftBig', MPSL_TEXTDOMAIN),
-                    'fadeInRight' => __('fadeInRight', MPSL_TEXTDOMAIN),
-                    'fadeInRightBig' => __('fadeInRightBig', MPSL_TEXTDOMAIN),
-                    'fadeInUp' => __('fadeInUp', MPSL_TEXTDOMAIN),
-                    'fadeInUpBig' => __('fadeInUpBig', MPSL_TEXTDOMAIN),
-                    'flip' => __('flip', MPSL_TEXTDOMAIN),
-                    'flipInX' => __('flipInX', MPSL_TEXTDOMAIN),
-                    'flipInY' => __('flipInY', MPSL_TEXTDOMAIN),
-                    'lightSpeedIn' => __('lightSpeedIn', MPSL_TEXTDOMAIN),
-                    'rotateIn' => __('rotateIn', MPSL_TEXTDOMAIN),
-                    'rotateInDownLeft' => __('rotateInDownLeft', MPSL_TEXTDOMAIN),
-                    'rotateInDownRight' => __('rotateInDownRight', MPSL_TEXTDOMAIN),
-                    'rotateInUpLeft' => __('rotateInUpLeft', MPSL_TEXTDOMAIN),
-                    'rotateInUpRight' => __('rotateInUpRight', MPSL_TEXTDOMAIN),
-                    'rollIn' => __('rollIn', MPSL_TEXTDOMAIN),
-                    'zoomIn' => __('zoomIn', MPSL_TEXTDOMAIN),
-                    'zoomInDown' => __('zoomInDown', MPSL_TEXTDOMAIN),
-                    'zoomInLeft' => __('zoomInLeft', MPSL_TEXTDOMAIN),
-                    'zoomInRight' => __('zoomInRight', MPSL_TEXTDOMAIN),
-                    'zoomInUp' => __('zoomInUp', MPSL_TEXTDOMAIN)
-                )
+            'start_animation' => $this->getOptionsByType('start', 'animation', false),
+            'start_timing_function' => $this->getOptionsByType('start', 'easings', false),
+            'start_duration' => $this->getOptionsByType('start', 'duration', false),
+            'end_animation' => $this->getOptionsByType('end', 'animation', false),
+            'end_timing_function' => $this->getOptionsByType('end', 'easings', false),
+            'end_duration' => $this->getOptionsByType('end', 'duration', false),
+
+            'start_animation_group' => array(
+                'type' => 'animation_control',
+                'id' => 'start_animation_btn',
+                'animation_type' => 'start',
+                'text' => __('Edit', 'motopress-slider'),
+                'skip' => true,
+                'skipChild' => true,
+                'options' => array(
+                    'start_duration_clone' => $this->getOptionsByType('start', 'duration', true),
+                    'start_timing_function_clone' => $this->getOptionsByType('start', 'easings',true),
+                    'start_animation_clone' => $this->getOptionsByType('start', 'animation', true),
+                ),
             ),
-            'start_timing_function' => array(
-                'type' => 'select',
-                'label2' => __('Easing :', MPSL_TEXTDOMAIN),
-                'default' => 'linear',
-                'list' => array(
-                    'linear' => __('linear', MPSL_TEXTDOMAIN),
-                    'ease' => __('ease', MPSL_TEXTDOMAIN),
-                    'easeIn' => __('easeIn', MPSL_TEXTDOMAIN),
-                    'easeInOut' => __('easeInOut', MPSL_TEXTDOMAIN),
-                    'easeInQuad' => __('easeInQuad', MPSL_TEXTDOMAIN),
-                    'easeInCubic' => __('easeInCubic', MPSL_TEXTDOMAIN),
-                    'easeInQuart' => __('easeInQuart', MPSL_TEXTDOMAIN),
-                    'easeInQuint' => __('easeInQuint', MPSL_TEXTDOMAIN),
-                    'easeInSine' => __('easeInSine', MPSL_TEXTDOMAIN),
-                    'easeInExpo' => __('easeInExpo', MPSL_TEXTDOMAIN),
-                    'easeInCirc' => __('easeInCirc', MPSL_TEXTDOMAIN),
-                    'easeInBack' => __('easeInBack', MPSL_TEXTDOMAIN),
-                    'easeInOutQuad' => __('easeInOutQuad', MPSL_TEXTDOMAIN),
-                    'easeInOutCubic' => __('easeInOutCubic', MPSL_TEXTDOMAIN),
-                    'easeInOutQuart' => __('easeInOutQuart', MPSL_TEXTDOMAIN),
-                    'easeInOutQuint' => __('easeInOutQuint', MPSL_TEXTDOMAIN),
-                    'easeInOutSine' => __('easeInOutSine', MPSL_TEXTDOMAIN),
-                    'easeInOutExpo' => __('easeInOutExpo', MPSL_TEXTDOMAIN),
-                    'easeInOutCirc' => __('easeInOutCirc', MPSL_TEXTDOMAIN),
-                    'easeInOutBack' => __('easeInOutBack', MPSL_TEXTDOMAIN),
-                )
+            'end_animation_group' => array(
+                'type' => 'animation_control',
+                'id' => 'end_animation_btn',
+                'animation_type' => 'end',
+                'text' => __('Edit', 'motopress-slider'),
+                'skip' => true,
+                'skipChild' => true,
+                'options' => array(
+                    'end_duration_clone' => $this->getOptionsByType('end','duration', true),
+                    'end_timing_function_clone' => $this->getOptionsByType('end', 'easings', true),
+                    'end_animation_clone' => $this->getOptionsByType('end', 'animation', true),
+                ),
             ),
-            'start_duration' => array(
-                'type' => 'number',
-                'label2' => __('duration (ms): ', MPSL_TEXTDOMAIN),
-                'default' => 1000,
-                'min' => 0
-            ),
-            'end_animation' => array(
-                'type' => 'select',
-                'label2' => __('End Animation :', MPSL_TEXTDOMAIN),
-                'default' => 'auto',
-                'list' => array(
-                    'auto' => __('auto', MPSL_TEXTDOMAIN),
-                    'bounceOut' => __('bounceOut', MPSL_TEXTDOMAIN),
-                    'bounceOutDown' => __('bounceOutDown', MPSL_TEXTDOMAIN),
-                    'bounceOutLeft' => __('bounceOutLeft', MPSL_TEXTDOMAIN),
-                    'bounceOutRight' => __('bounceOutRight', MPSL_TEXTDOMAIN),
-                    'bounceOutUp' => __('bounceOutUp', MPSL_TEXTDOMAIN),
-                    'fadeOut' => __('fadeOut', MPSL_TEXTDOMAIN),
-                    'fadeOutDown' => __('fadeOutDown', MPSL_TEXTDOMAIN),
-                    'fadeOutDownBig' => __('fadeOutDownBig', MPSL_TEXTDOMAIN),
-                    'fadeOutLeft' => __('fadeOutLeft', MPSL_TEXTDOMAIN),
-                    'fadeOutLeftBig' => __('fadeOutLeftBig', MPSL_TEXTDOMAIN),
-                    'fadeOutRight' => __('fadeOutRight', MPSL_TEXTDOMAIN),
-                    'fadeOutUp' => __('fadeOutUp', MPSL_TEXTDOMAIN),
-                    'fadeOutUpBig' => __('fadeOutUpBig', MPSL_TEXTDOMAIN),
-                    'flip' => __('flip', MPSL_TEXTDOMAIN),
-                    'flipOutX' => __('flipOutX', MPSL_TEXTDOMAIN),
-                    'flipOutY' => __('flipOutY', MPSL_TEXTDOMAIN),
-                    'lightSpeedOut' => __('lightSpeedOut', MPSL_TEXTDOMAIN),
-                    'rotateOut' => __('rotateOut', MPSL_TEXTDOMAIN),
-                    'rotateOutDownLeft' => __('rotateOutDownLeft', MPSL_TEXTDOMAIN),
-                    'rotateOutDownRight' => __('rotateOutDownRight', MPSL_TEXTDOMAIN),
-                    'rotateOutUpLeft' => __('rotateOutUpLeft', MPSL_TEXTDOMAIN),
-                    'rotateOutUpRight' => __('rotateOutUpRight', MPSL_TEXTDOMAIN),
-                    'rollOut' => __('rollOut', MPSL_TEXTDOMAIN),
-                    'zoomOut' => __('zoomOut', MPSL_TEXTDOMAIN),
-                    'zoomOutDown' => __('zoomOutDown', MPSL_TEXTDOMAIN),
-                    'zoomOutLeft' => __('zoomOutLeft', MPSL_TEXTDOMAIN),
-                    'zoomOutRight' => __('zoomOutRight', MPSL_TEXTDOMAIN),
-                    'zoomOutUp' => __('zoomOutUp', MPSL_TEXTDOMAIN)
-                )
-            ),
-            'end_timing_function' => array(
-                'type' => 'select',
-                'label2' => __('Easing :', MPSL_TEXTDOMAIN),
-                'default' => 'linear',
-                'list' => array(
-                    'linear' => __('linear', MPSL_TEXTDOMAIN),
-                    'ease' => __('ease', MPSL_TEXTDOMAIN),
-                    'easeOutQuad' => __('easeOutQuad', MPSL_TEXTDOMAIN),
-                    'easeOutCubic' => __('easeOutCubic', MPSL_TEXTDOMAIN),
-                    'easeOutQuart' => __('easeOutQuart', MPSL_TEXTDOMAIN),
-                    'easeOutQuint' => __('easeOutQuint', MPSL_TEXTDOMAIN),
-                    'easeOutSine' => __('easeOutSine', MPSL_TEXTDOMAIN),
-                    'easeOutExpo' => __('easeOutExpo', MPSL_TEXTDOMAIN),
-                    'easeOutCirc' => __('easeOutCirc', MPSL_TEXTDOMAIN),
-                    'easeOutBack' => __('easeOutBack', MPSL_TEXTDOMAIN),
-                    'easeInOutQuad' => __('easeInOutQuad', MPSL_TEXTDOMAIN),
-                    'easeInOutCubic' => __('easeInOutCubic', MPSL_TEXTDOMAIN),
-                    'easeInOutQuart' => __('easeInOutQuart', MPSL_TEXTDOMAIN),
-                    'easeInOutQuint' => __('easeInOutQuint', MPSL_TEXTDOMAIN),
-                    'easeInOutSine' => __('easeInOutSine', MPSL_TEXTDOMAIN),
-                    'easeInOutExpo' => __('easeInOutExpo', MPSL_TEXTDOMAIN),
-                    'easeInOutCirc' => __('easeInOutCirc', MPSL_TEXTDOMAIN),
-                    'easeInOutBack' => __('easeInOutBack', MPSL_TEXTDOMAIN),
-                )
-            ),
-            'end_duration' => array(
-                'type' => 'number',
-                'label2' => __('duration (ms): ', MPSL_TEXTDOMAIN),
-                'default' => 1000,
-                'min' => 0
-            ),
+
+
             'start' => array(
                 'type' => 'number',
-                'label2' => __('Display at (ms): ', MPSL_TEXTDOMAIN),
+                'label2' => __('Display at (ms): ', 'motopress-slider'),
                 'default' => 1000,
                 'min' => 0,
 //                'max' => 9000,
             ),
             'end' => array(
                 'type' => 'number',
-                'label2' => __('Hide at (ms): ', MPSL_TEXTDOMAIN),
+                'label2' => __('Hide at (ms): ', 'motopress-slider'),
                 'default' => 0,
                 'min' => 0
             ),
             'text' => array(
-                'type' => 'textarea',
-                'label' => __('Text/HTML', MPSL_TEXTDOMAIN),
-                'default' => __('lorem ipsum', MPSL_TEXTDOMAIN),
+                'type' => 'tiny_mce',
+                'label' => __('Text/HTML', 'motopress-slider'),
+                'default' => __('lorem ipsum', 'motopress-slider'),
+                'plugins' => array(
+                ),
                 'dependency' => array(
                     'parameter' => 'type',
                     'value' => 'html'
@@ -236,8 +140,8 @@ return array(
             ),
             'button_text' => array(
                 'type' => 'text',
-                'label' => __('Button Text', MPSL_TEXTDOMAIN),
-                'default' => __('Button', MPSL_TEXTDOMAIN),
+                'label' => __('Button Text', 'motopress-slider'),
+                'default' => __('Button', 'motopress-slider'),
                 'dependency' => array(
                     'parameter' => 'type',
                     'value' => 'button'
@@ -245,8 +149,26 @@ return array(
             ),
             'button_link' => array(
                 'type' => 'text',
-                'label' => __('Link:', MPSL_TEXTDOMAIN),
+                'label' => __('Link:', 'motopress-slider'),
                 'default' => '#',
+                'dependency' => array(
+                    'parameter' => 'type',
+                    'value' => 'button'
+                )
+            ),
+            'button_autolink' => array(
+                'type' => 'action_group',
+                'label' => __('To Post', 'motopress-slider'),
+                'default' => '',
+                'list' => array(
+                    'permalink' => __('#link to post', 'motopress-slider')
+                ),
+	            'actions' => array(
+                    'permalink' => array(
+                        'button_link' => '%permalink%',
+                    ),
+                ),
+                'classes' => 'button-link',
                 'dependency' => array(
                     'parameter' => 'type',
                     'value' => 'button'
@@ -254,7 +176,7 @@ return array(
             ),
             'button_target' => array(
                 'type' => 'checkbox',
-                'label2' => __('Open in new window', MPSL_TEXTDOMAIN),
+                'label2' => __('Open in new window', 'motopress-slider'),
                 'default' => 'false',
                 'dependency' => array(
                     'parameter' => 'type',
@@ -263,15 +185,15 @@ return array(
             ),
             'image_id' => array(
                 'type' => 'library_image',
-//                'label2' => __('Image', MPSL_TEXTDOMAIN),
+//                'label2' => __('Image', 'motopress-slider'),
                 'default' => '',
                 'dependency' => array(
                     'parameter' => 'type',
                     'value' => 'image'
                 ),
                 'helpers' => array('image_url'),
-                'button_label' => __('Select Image', MPSL_TEXTDOMAIN),
-                'select_label' => __('Select Image', MPSL_TEXTDOMAIN)
+                'button_label' => __('Select Image', 'motopress-slider'),
+                'select_label' => __('Select Image', 'motopress-slider')
             ),
             'image_url' => array(
                 'type' => 'hidden',
@@ -283,7 +205,7 @@ return array(
             ),
 	        'image_link' => array(
                 'type' => 'text',
-                'label' => __('Link:', MPSL_TEXTDOMAIN),
+                'label' => __('Link:', 'motopress-slider'),
                 'default' => '',
                 'dependency' => array(
                     'parameter' => 'type',
@@ -292,8 +214,26 @@ return array(
             ),
             'image_target' => array(
                 'type' => 'checkbox',
-                'label2' => __('Open in new window', MPSL_TEXTDOMAIN),
+                'label2' => __('Open in new window', 'motopress-slider'),
                 'default' => 'false',
+                'dependency' => array(
+                    'parameter' => 'type',
+                    'value' => 'image'
+                )
+            ),
+            'image_autolink' => array(
+                'type' => 'action_group',
+                'label' => __('To Post', 'motopress-slider'),
+                'default' => '',
+                'list' => array(
+                    'permalink' => __('#link to post', 'motopress-slider')
+                ),
+                'actions' => array(
+                    'permalink' => array(
+                        'image_link' => '%permalink%',
+                    ),
+                ),
+                'classes' => 'button-link',
                 'dependency' => array(
                     'parameter' => 'type',
                     'value' => 'image'
@@ -304,9 +244,9 @@ return array(
                 'type' => 'button_group',
                 'default' => 'youtube',
                 'list' => array(
-                    'youtube' => __('Youtube', MPSL_TEXTDOMAIN),
-                    'vimeo' => __('Vimeo', MPSL_TEXTDOMAIN),
-                    'html' => __('Media Library', MPSL_TEXTDOMAIN)
+                    'youtube' => __('Youtube', 'motopress-slider'),
+                    'vimeo' => __('Vimeo', 'motopress-slider'),
+                    'html' => __('Media Library', 'motopress-slider')
                 ),
                 'button_size' => 'large',
                 'dependency' => array(
@@ -321,12 +261,12 @@ return array(
 //                    'parameter' => 'video_type',
 //                    'value' => 'html'
 //                ),
-//                'button_label' => __('Select Video', MPSL_TEXTDOMAIN)
+//                'button_label' => __('Select Video', 'motopress-slider')
 //            ),
             'video_src_mp4' => array(
                 'type' => 'text',
                 'default' => '',
-                'label' => __('Source MP4: ', MPSL_TEXTDOMAIN),
+                'label' => __('Source MP4: ', 'motopress-slider'),
                 'dependency' => array(
                     'parameter' => 'video_type',
                     'value' => 'html'
@@ -335,7 +275,7 @@ return array(
             'video_src_webm' => array(
                 'type' => 'text',
                 'default' => '',
-                'label' => __('Source WEBM: ', MPSL_TEXTDOMAIN),
+                'label' => __('Source WEBM: ', 'motopress-slider'),
                 'dependency' => array(
                     'parameter' => 'video_type',
                     'value' => 'html'
@@ -344,7 +284,7 @@ return array(
             'video_src_ogg' => array(
                 'type' => 'text',
                 'default' => '',
-                'label' => __('Source OGG: ', MPSL_TEXTDOMAIN),
+                'label' => __('Source OGG: ', 'motopress-slider'),
                 'dependency' => array(
                     'parameter' => 'video_type',
                     'value' => 'html'
@@ -369,7 +309,7 @@ return array(
             'video_preview_image' => array(
                 'type' => 'text',
                 'default' => '',
-                'label' => __('Preview Image URL:', MPSL_TEXTDOMAIN),
+                'label' => __('Preview Image URL:', 'motopress-slider'),
                 'dependency' => array(
                     'parameter' => 'type',
                     'value' => 'video'
@@ -397,7 +337,7 @@ return array(
             ),
             'video_autoplay' => array(
                 'type' => 'checkbox',
-                'label' => __('Autoplay', MPSL_TEXTDOMAIN),
+                'label' => __('Autoplay', 'motopress-slider'),
                 'default' => false,
                 'dependency' => array(
                     'parameter' => 'type',
@@ -406,11 +346,11 @@ return array(
             ),
 //            'video_loop' => array(
 //                'type' => 'select',
-//                'label' => __('Loop', MPSL_TEXTDOMAIN),
+//                'label' => __('Loop', 'motopress-slider'),
 //                'default' => 'disabled',
 //                'list' => array(
-//                    'disabled' => __('disabled', MPSL_TEXTDOMAIN),
-//                    'loop' => __('Loop', MPSL_TEXTDOMAIN)
+//                    'disabled' => __('disabled', 'motopress-slider'),
+//                    'loop' => __('Loop', 'motopress-slider')
 //                ),
 //                'dependency' => array(
 //                    'parameter' => 'type',
@@ -419,7 +359,7 @@ return array(
 //            ),
             'video_loop' => array(
                 'type' => 'checkbox',
-                'label' => __('Loop', MPSL_TEXTDOMAIN),
+                'label' => __('Loop', 'motopress-slider'),
                 'default' => false,
                 'dependency' => array(
                     'parameter' => 'type',
@@ -428,7 +368,7 @@ return array(
             ),
             'video_html_hide_controls' => array(
                 'type' => 'checkbox',
-                'label' => __('Hide Controls: ', MPSL_TEXTDOMAIN),
+                'label' => __('Hide Controls', 'motopress-slider'),
                 'default' => false,
                 'dependency' => array(
                     'parameter' => 'video_type',
@@ -437,7 +377,7 @@ return array(
             ),
             'video_youtube_hide_controls' => array(
                 'type' => 'checkbox',
-                'label' => __('Hide Controls: ', MPSL_TEXTDOMAIN),
+                'label' => __('Hide Controls', 'motopress-slider'),
                 'default' => false,
                 'dependency' => array(
                     'parameter' => 'video_type',
@@ -446,7 +386,7 @@ return array(
             ),
             'video_mute' => array(
                 'type' => 'checkbox',
-                'label' => __('Mute: ', MPSL_TEXTDOMAIN),
+                'label' => __('Mute', 'motopress-slider'),
                 'default' => false,
                 'dependency' => array(
                     'parameter' => 'type',
@@ -455,7 +395,7 @@ return array(
             ),
             'video_disable_mobile' => array(
                 'type' => 'checkbox',
-                'label' => __('Disable Mobile: ', MPSL_TEXTDOMAIN),
+                'label' => __('Disable Mobile', 'motopress-slider'),
                 'default' => false,
                 'dependency' => array(
                     'parameter' => 'type',
@@ -464,7 +404,7 @@ return array(
             ),
             'width' => array(
                 'type' => 'number',
-                'label2' => __('width', MPSL_TEXTDOMAIN),
+                'label2' => __('width:', 'motopress-slider'),
 //                'default' => 300,
                 'default' => '',
                 'min' => 1,
@@ -473,11 +413,34 @@ return array(
                     'value' => 'image'
                 )
             ),
+            'html_width' => array(
+                'type' => 'number',
+                'label2' => __('width:', 'motopress-slider'),
+                'default' => '',
+                'min' => 1,
+                'dependency' => array(
+                    'parameter' => 'type',
+                    'value' => 'html'
+                )
+            ),
+            'white-space' => array(
+                'type' => 'select',
+                'label' => __('Whitespace:', 'motopress-slider'),
+                'default' => 'normal',
+                'list' => array(
+	                'normal' => 'Normal',
+	                'nowrap' => 'No-wrap'
+                ),
+                'dependency' => array(
+                    'parameter' => 'type',
+                    'value' => 'html'
+                )
+            ),
             'preset' => array(
                 'type' => 'style_editor',
-                'label2' => __('Style: ', MPSL_TEXTDOMAIN),
-                'edit_label' => __('Edit', MPSL_TEXTDOMAIN),
-                'remove_label' => __('Remove', MPSL_TEXTDOMAIN),
+                'label2' => __('Style: ', 'motopress-slider'),
+                'edit_label' => __('Edit', 'motopress-slider'),
+                'remove_label' => __('Remove', 'motopress-slider'),
 	            'helpers' => array('private_styles'),
 	            'default' => '',
             ),
@@ -491,12 +454,12 @@ return array(
             ),
 	        'classes' => array(
                 'type' => 'text',
-                'label2' => __('Custom Classes: ', MPSL_TEXTDOMAIN),
+                'label2' => __('CSS Classes: ', 'motopress-slider'),
                 'default' => ''
             ),
 	        'image_link_classes' => array(
                 'type' => 'text',
-                'label2' => __('Link Custom Classes: ', MPSL_TEXTDOMAIN),
+                'label2' => __('Link Custom Classes: ', 'motopress-slider'),
                 'default' => '',
                 'dependency' => array(
                     'parameter' => 'type',
@@ -507,16 +470,16 @@ return array(
 	        // Deprecated
 	        'html_style' => array(
                 'type' => 'select',
-                'label' => __('Theme Styles (deprecated)', MPSL_TEXTDOMAIN),
+                'label' => __('Theme Styles (deprecated)', 'motopress-slider'),
                 'default' => '',
                 'list' => array(
-                    '' => __('none', MPSL_TEXTDOMAIN),
-                    'mpsl-header-dark' => __('Header Dark', MPSL_TEXTDOMAIN),
-                    'mpsl-header-white' => __('Header White', MPSL_TEXTDOMAIN),
-                    'mpsl-sub-header-dark' => __('Sub-Header Dark', MPSL_TEXTDOMAIN),
-                    'mpsl-sub-header-white' => __('Sub-Header White', MPSL_TEXTDOMAIN),
-                    'mpsl-text-dark' => __('Text Dark', MPSL_TEXTDOMAIN),
-                    'mpsl-text-white' => __('Text White', MPSL_TEXTDOMAIN),
+                    '' => __('none', 'motopress-slider'),
+                    'mpsl-header-dark' => __('Header Dark', 'motopress-slider'),
+                    'mpsl-header-white' => __('Header White', 'motopress-slider'),
+                    'mpsl-sub-header-dark' => __('Sub-Header Dark', 'motopress-slider'),
+                    'mpsl-sub-header-white' => __('Sub-Header White', 'motopress-slider'),
+                    'mpsl-text-dark' => __('Text Dark', 'motopress-slider'),
+                    'mpsl-text-white' => __('Text White', 'motopress-slider'),
                 ),
                 'dependency' => array(
                     'parameter' => 'type',
@@ -525,13 +488,13 @@ return array(
             ),
             'button_style' => array(
                 'type' => 'select',
-                'label' => __('Theme Styles (deprecated)', MPSL_TEXTDOMAIN),
+                'label' => __('Theme Styles (deprecated)', 'motopress-slider'),
                 'default' => '',
                 'list' => array(
-                    '' => __('none', MPSL_TEXTDOMAIN),
-                    'mpsl-button-blue' => __('Button Blue', MPSL_TEXTDOMAIN),
-                    'mpsl-button-green' => __('Button Green', MPSL_TEXTDOMAIN),
-                    'mpsl-button-red' => __('Button Red', MPSL_TEXTDOMAIN)
+                    '' => __('none', 'motopress-slider'),
+                    'mpsl-button-blue' => __('Button Blue', 'motopress-slider'),
+                    'mpsl-button-green' => __('Button Green', 'motopress-slider'),
+                    'mpsl-button-red' => __('Button Red', 'motopress-slider')
                 ),
                 'dependency' => array(
                     'parameter' => 'type',
@@ -542,3 +505,13 @@ return array(
         )
     ),
 );
+
+if ($sliderType === 'custom') {
+    unset($result['general']['options']['button_autolink']);
+    unset($result['general']['options']['image_autolink']);
+
+} else { // post | woocommerce
+	$result['general']['options']['text']['default'] = '%title%';
+}
+
+return $result;

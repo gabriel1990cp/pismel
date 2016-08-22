@@ -1,28 +1,38 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
-$id = $slider->getId();?>
+/** @var $this MPSLSliderOptions */
+$sliderId = $this->getId();
+?>
 <div class="mpsl-slider-settings-wrapper">
 <?php
-if (is_null($id)){
-    echo '<h3>' . __('New Slider Settings', MPSL_TEXTDOMAIN) . '</h3>';
+if (is_null($sliderId)) {
+	$sliderType = isset($_REQUEST['slider_type']) ? $_REQUEST['slider_type'] : 'custom';
+	$this->updateOption('main', 'slider_type', $sliderType);
+	echo '<h3>' . __('New Slider Settings', 'motopress-slider') . '</h3>';
 } else {
-    echo '<h3>' . __('Slider Settings', MPSL_TEXTDOMAIN) . '</h3>';
-}?>
+	echo '<h3>' . __('Slider Settings', 'motopress-slider') . '</h3>';
+	$sliderOption = $this->getOption('main', 'slider_type');
+	$sliderType = $sliderOption['value'];
+}
+
+?>
 
 <div id="mpsl-slider-settings-tabs" class="mpsl-slider-settings-wrapper mpsl_options_wrapper">
     <?php $sliderSettingsPrefix = 'mpsl-slider-settings-'; ?>
     <ul>
-    <?php foreach ($slider->options as $groupKey => $group) {
+    <?php foreach ($this->options as $groupKey => $group) {
         echo '<li><a href="#' . $sliderSettingsPrefix . $groupKey . '">' . $group['title'] . '</a></li>';
     } ?>
     </ul>
-    <?php foreach ($slider->options as $groupKey => $group) { ?>
+    <?php foreach ($this->options as $groupKey => $group) { ?>
+
     <div id="<?php echo $sliderSettingsPrefix . $groupKey; ?>">
         <table class="form-table">
             <tbody>
             <?php foreach ($group['options'] as $optionKey => $option) { ?>
-                <tr class="mpsl-option-wrapper <?php echo ($option['type'] === 'hidden') ? 'mpsl-option-wrapper-hidden' : ''; ?>">
+
+                <tr class="mpsl-option-wrapper <?php echo ($option['type'] === 'hidden' || $option['hidden']) ? 'mpsl-option-wrapper-hidden' : ''; ?>">
                 <?php if (isset($option['label'])) { ?>
                     <th>
                         <?php MPSLOptionsFactory::addLabel($option); ?>
@@ -39,22 +49,35 @@ if (is_null($id)){
             <?php } ?>
             <tbody>
         </table>
+        <?php if (in_array($groupKey, array('post_settings', 'woocommerce_settings'))) {
+            include $mpsl_settings['plugin_dir_path'] . 'views/preview-posts.php';
+        } ?>
     </div>
     <?php } ?>
 </div>
 
+
+
+
 <div class="control-panel">
-    <?php if (is_null($slider->getId())) {
-        echo '<button type="button" class="button-primary mpsl-button" id="create_slider">' . __('Create Slider', MPSL_TEXTDOMAIN) . '</button>';
-        echo '<a class="button-secondary mpsl-button" href="' . add_query_arg(array('view' => 'sliders') ,menu_page_url($mpsl_settings['plugin_name'], false)) . '">' . __('Cancel', MPSL_TEXTDOMAIN) . '</a>';
+    <?php if (is_null($sliderId)) {
+        echo '<button type="button" class="button-primary mpsl-button" id="create_slider">' . __('Create Slider', 'motopress-slider') . '</button>';
+        echo '<a class="button-secondary mpsl-button" href="' . add_query_arg(array('view' => 'sliders') ,menu_page_url($mpsl_settings['plugin_name'], false)) . '">' . __('Cancel', 'motopress-slider') . '</a>';
     } else {
-        echo '<button data-id="' . $slider->getId() . '" type="button" class="button-primary mpsl-button" id="update_slider">' . __('Save Settings', MPSL_TEXTDOMAIN) . '</button>';
-//        echo '<button data-id="' . $slider->getId() . '" type="button" class="button-secondary mpsl-button" id="delete_slider">' . __('Delete Slider', MPSL_TEXTDOMAIN) . '</button>';
-        echo '<a id="edit_slides" class="button-secondary mpsl-button" href="' . add_query_arg(array('view' => 'slides', 'id' => $slider->getId()), menu_page_url($mpsl_settings['plugin_name'], false)) . '">' . __('Edit Slides', MPSL_TEXTDOMAIN) . '</a>';
-	    echo '<a id="slider_preview" class="button-secondary mpsl-button" href="#" data-mpsl-slider-id="'. $slider->getId() .'" >' . __('Preview slider', MPSL_TEXTDOMAIN) . '</a>';
-        echo '<a class="button-secondary mpsl-button" href="' . add_query_arg(array('view' => 'sliders') ,menu_page_url($mpsl_settings['plugin_name'], false)) . '">' . __('Close', MPSL_TEXTDOMAIN) . '</a>';
+        echo '<button data-id="' . $sliderId . '" type="button" class="button-primary mpsl-button" id="update_slider">' . __('Save Settings', 'motopress-slider') . '</button>';
+//        echo '<button data-id="' . $sliderId . '" type="button" class="button-secondary mpsl-button" id="delete_slider">' . __('Delete Slider', 'motopress-slider') . '</button>';
+
+        if($sliderType !== 'custom'){
+            echo '<a id="edit_slides_template" class="button-secondary mpsl-button" href="' . add_query_arg(array('view' => 'slide', 'id' => $this->getTemplateId()), menu_page_url($mpsl_settings['plugin_name'], false)) . '">' . __('Edit Template', 'motopress-slider') . '</a>';
+        }else{
+            echo '<a id="edit_slides" class="button-secondary mpsl-button" href="' . add_query_arg(array('view' => 'slides', 'id' => $sliderId), menu_page_url($mpsl_settings['plugin_name'], false)) . '">' . __('Edit Slides', 'motopress-slider') . '</a>';
+        }
+
+        echo '<a id="slider_preview" class="button-secondary mpsl-button" href="#" data-mpsl-slider-id="'. $sliderId .'" >' . __('Preview slider', 'motopress-slider') . '</a>';
+        echo '<a class="button-secondary mpsl-button" href="' . add_query_arg(array('view' => 'sliders') ,menu_page_url($mpsl_settings['plugin_name'], false)) . '">' . __('Close', 'motopress-slider') . '</a>';
     }
     ?>
 </div>
+
 </div>
 <?php include $mpsl_settings['plugin_dir_path'] . 'views/preview-dialog.php'; ?>

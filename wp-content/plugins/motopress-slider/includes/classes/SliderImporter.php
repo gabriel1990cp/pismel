@@ -26,7 +26,7 @@ class MPSLSliderImporter {
             }
         } else {
             if($this->isVerbose){
-                _e( 'Import file is not readable.', MPSL_TEXTDOMAIN) . "<br/>";
+                _e( 'Import file is not readable.', 'motopress-slider') . "<br/>";
             }
             return false;
         }        
@@ -34,7 +34,7 @@ class MPSLSliderImporter {
     
     public function renderImportPage(){  
         global $mpsl_settings;
-        echo '<h1>' . sprintf(__('Importing %s', MPSL_TEXTDOMAIN), $mpsl_settings['product_name']) . '</h1>';        
+        echo '<h1>' . sprintf(__('Importing %s', 'motopress-slider'), $mpsl_settings['product_name']) . '</h1>';
         $step = isset( $_REQUEST['step'] ) && !empty( $_REQUEST['step'] ) ? (int)$_REQUEST['step'] : 1;
         switch($step) { 
             case '1' : 
@@ -61,7 +61,7 @@ class MPSLSliderImporter {
         wp_enqueue_script('mpsl-importer', $this->mpsl_settings['plugin_dir_url'] . "js/importer.js", array('jquery'), $this->mpsl_settings['plugin_version'], true);
     ?>                
         <form action="<?php echo admin_url( 'admin.php?import=mpsl-importer&step=2'); ?>" method="post" enctype="multipart/form-data" >
-            <p><?php printf(__('To import sliders select %s Export file that you downloaded before then click import button.', MPSL_TEXTDOMAIN), $this->mpsl_settings['product_name']); ?></p>
+            <p><?php printf(__('To import sliders select %s Export file that you downloaded before then click import button.', 'motopress-slider'), $this->mpsl_settings['product_name']); ?></p>
             <?php wp_nonce_field('mpsl-import', 'mpsl-import-nonce'); ?>
             <input type="hidden" name="mpsl-import-type" value="manual">
             <input type="hidden" name="max_file_size" value="<?php echo $bytes; ?>" />
@@ -69,11 +69,11 @@ class MPSLSliderImporter {
                 <tbody>
                     <tr>
                         <th scope="row">
-                            <?php _e('Import File: ', MPSL_TEXTDOMAIN); ?>
+                            <?php _e('Import File: ', 'motopress-slider'); ?>
                         </th>
                         <td>
                             <input type="file" name="mpsl-import-file" id="mpsl-import-file" required="required">
-                            <small><?php printf( __( 'Maximum size: %s', MPSL_TEXTDOMAIN ), $size ); ?></small>                
+                            <small><?php printf( __( 'Maximum size: %s', 'motopress-slider' ), $size ); ?></small>
                         </td>
                     </tr>                    
                     <tr>
@@ -81,12 +81,12 @@ class MPSLSliderImporter {
                         </th>
                         <td>
                             <input type="checkbox" name="mpsl_http_auth" id="mpsl_http_auth" value="true" autocomplete="off">
-                            <label for="mpsl_http_auth"><?php _e('Enable HTTP Auth', MPSL_TEXTDOMAIN);?></label>
+                            <label for="mpsl_http_auth"><?php _e('Enable HTTP Auth', 'motopress-slider');?></label>
                         </td>
                     </tr>   
                     <tr class="need-mpsl_http_auth" style="display: none;">
                         <th scope="row">
-                            <?php _e('Login:', MPSL_TEXTDOMAIN);?>
+                            <?php _e('Login:', 'motopress-slider');?>
                         </th>
                         <td>
                             <input type="text" name="mpsl_http_auth_login" id="mpsl_http_auth_login" disabled="disabled" autocomplete="off"/>
@@ -94,7 +94,7 @@ class MPSLSliderImporter {
                     </tr>   
                     <tr class="need-mpsl_http_auth" style="display: none;">
                         <th scope="row">
-                            <?php _e('Password:', MPSL_TEXTDOMAIN);?>
+                            <?php _e('Password:', 'motopress-slider');?>
                         </th>
                         <td>
                             <input type="password" name="mpsl_http_auth_password" id="mpsl_http_auth_password" disabled="disabled" autocomplete="off"/>
@@ -102,47 +102,73 @@ class MPSLSliderImporter {
                     </tr>   
                 </tbody>
             </table>           
-            <button type="submit" class="button-primary"><?php esc_attr_e( 'Import', MPSL_TEXTDOMAIN ); ?></button>
+            <button type="submit" class="button-primary"><?php esc_attr_e( 'Import', 'motopress-slider' ); ?></button>
             <br/>            
         </form>      
     <?php
-    }        
-    
-    private function processImport(){
-        $this->isVerbose = true;                
-        if( isset($_POST['mpsl-import-type']) && $_POST['mpsl-import-type'] === 'manual' ) {            
-            if( check_admin_referer('mpsl-import', 'mpsl-import-nonce') ) {                
-                if ( $_FILES['mpsl-import-file']['error'] == UPLOAD_ERR_OK  && is_uploaded_file( $_FILES['mpsl-import-file']['tmp_name'] ) ) {                                                
-                    $data = file_get_contents( $_FILES['mpsl-import-file']['tmp_name'] );
-                    if (false !== $data) {                        
-                        $this->importData( $data );
-                    }                        
-                }
-            }
-        }
     }
-        
-    private function importData($data){
+
+	private function processImport() {
+		$this->isVerbose = true;
+		if (isset($_POST['mpsl-import-type']) && $_POST['mpsl-import-type'] === 'manual') {
+			if (check_admin_referer('mpsl-import', 'mpsl-import-nonce')) {
+				$action = isset($_GET['action']) && $_GET['action'] ? $_GET['action'] : 'file';
+				$data = false;
+
+				if ($action === 'file') {
+					if ($_FILES['mpsl-import-file']['error'] == UPLOAD_ERR_OK && is_uploaded_file($_FILES['mpsl-import-file']['tmp_name'])) {
+						$data = file_get_contents($_FILES['mpsl-import-file']['tmp_name']);
+					}
+
+				} elseif ($action === 'preset') {
+					$presetId = isset($_POST['preset_id']) ? $_POST['preset_id'] : false;
+					if ($presetId) {
+						$presetFile = $this->mpsl_settings['plugin_dir_path'] . "defaults/slider-presets/{$presetId}.json";
+						if (file_exists($presetFile)) {
+							$data = file_get_contents($presetFile);
+						}
+					}
+				}
+
+				if (false !== $data) {
+					$importResult = $this->importData($data, $action);
+
+					if ($importResult && $action === 'preset') {
+                        $menuUrl = menu_page_url($this->mpsl_settings['plugin_name'], false);
+                        $sliderUrl = add_query_arg(array('view'=>'slider', 'id'=> $importResult), $menuUrl);
+
+						echo '<br/><a href="' . $sliderUrl . '" class="button button-primary">' . __('Go to slider settings page', 'motopress-slider') . '</a>';
+//						wp_safe_redirect($sliderUrl);
+					}
+				}
+			}
+		}
+	}
+
+    private function importData($data, $action = 'file'){
         
         if( empty( $data ) )
             return false;
 
+        $slider = null;
         $import_data  = json_decode( $data, true );
-        
+
         if (! is_array($import_data)) {            
             if ($this->isVerbose)  
-                _e( 'Import data is not valid.', MPSL_TEXTDOMAIN) . "<br/>";
+                _e( 'Import data is not valid.', 'motopress-slider') . "<br/>";
             return false;
         }
 
+	    global $wpdb;
+
         if (isset($import_data['sliders'])) {
-	        global $wpdb, $mpslAdmin;
+	        global $mpslAdmin;
 
             $importedMedia = $this->importUploads($import_data['uploads']);
 
             if (!empty($importedMedia)) {
-                if ($this->isVerbose)  
-                    echo '<br/>' . __('Uploads imported', MPSL_TEXTDOMAIN) . '<br/><hr/><br/>';                
+                if ($this->isVerbose)
+                    echo '<br/>' . __('Uploads imported', 'motopress-slider') . '<br/><hr/><br/>';
             }            
             
             // replace placeholders in data with new attachment ids
@@ -154,13 +180,17 @@ class MPSLSliderImporter {
 			$newPresetClasses = $presetsExists ? $layerPresetsObj->loadNewPresets($import_data['presets']) : array();
 
             foreach($import_data['sliders'] as $slider_data) {
-                $slider = new MPSLSliderOptions();
-                $slider->overrideOptions($slider_data['options'], false);
+//                $slider = new MPSLSliderOptions();
+                $slider = new MPSLSliderOptions(array(
+			        'grouped' => false,
+			        'options' => $slider_data['options']
+		        ));
+//                $slider->overrideOptions($slider_data['options'], false);
                 $slider->makeAliasUnique();
-                $sliderId = $slider->create();
+                $sliderId = $slider->create(false);
                 if (false !== $sliderId) {
                     if ($this->isVerbose) {
-                        printf(__('Slider "%s" options imported.', MPSL_TEXTDOMAIN), $slider->getAlias());
+                        printf(__('Slider "%s" options imported.', 'motopress-slider'), $slider->getAlias());
                         echo '<br/>';
                     }
                     foreach($slider_data['slides'] as $slide_data) {
@@ -171,19 +201,19 @@ class MPSLSliderImporter {
                         $result = $slide->import($sliderId);
                         if (false !== $result) {
                             if ($this->isVerbose) {
-                                printf(__('Slide "%s" of slider "%s" imported.', MPSL_TEXTDOMAIN), $slide->getTitle(), $slider->getAlias());                            
+                                printf(__('Slide "%s" of slider "%s" imported.', 'motopress-slider'), $slide->getTitle(), $slider->getAlias());
                                 echo '<br/>';
                             }                                
                         } else {                            
                             if ($this->isVerbose) {
-                                printf(__('Slide "%s" of slider "%s" is not imported. Error: %s', MPSL_TEXTDOMAIN) , $slide->getTitle(), $slider->getAlias(), $wpdb->last_error);
+                                printf(__('Slide "%s" of slider "%s" is not imported. Error: %s', 'motopress-slider') , $slide->getTitle(), $slider->getAlias(), $wpdb->last_error);
                                 echo '<br/>';
                             }                                
                         }
                     }
                 } else {                    
                     if ($this->isVerbose) {
-                        printf(__('Slider "%s" is not imported. Error: %s', MPSL_TEXTDOMAIN), $slider->getAlias(), $wpdb->last_error);
+                        printf(__('Slider "%s" is not imported. Error: %s', 'motopress-slider'), $slider->getAlias(), $wpdb->last_error);
                         echo '<br/>';
                     }
                 }                         
@@ -194,17 +224,28 @@ class MPSLSliderImporter {
 	        $layerPresetsObj->updatePrivateStyles();
 			if ($presetsUpdateResult) {
 				if ($this->isVerbose) {
-					print(__('Presets imported.', MPSL_TEXTDOMAIN));
+					print(__('Presets imported.', 'motopress-slider'));
 					echo '<br/>';
 				}
 			} else {
 				if ($this->isVerbose) {
-					printf(__('Presets not imported. Error: %s', MPSL_TEXTDOMAIN), $wpdb->last_error);
+					printf(__('Presets not imported. Error: %s', 'motopress-slider'), $wpdb->last_error);
 					echo '<br/>';
 				}
 			}
         }
-        
+
+	    /** @todo: Check condition */
+        if ($action === 'preset') {
+	        if (!is_null($slider)) {
+		        return $slider->getId();
+	        } else {
+				printf(__('Slider preset import error: %s', 'motopress-slider'), $wpdb->last_error);
+				echo '<br/>';
+		        return false;
+	        }
+        }
+
         return true;
     }
     
@@ -260,7 +301,7 @@ class MPSLSliderImporter {
 
         if( is_wp_error( $upload ) || $upload['error'] ) {
             if ($this->isVerbose) {
-                printf(__('Failed to import media "%s" : ', MPSL_TEXTDOMAIN), $url);                          
+                printf(__('Failed to import media "%s" : ', 'motopress-slider'), $url);
                 if (is_wp_error($upload)){
                     foreach ($upload->get_error_messages() as $error) {
                         echo $error;
@@ -292,7 +333,7 @@ class MPSLSliderImporter {
         wp_update_attachment_metadata($attachment_id, wp_generate_attachment_metadata($attachment_id, $upload['file']));
         
         if ($this->isVerbose) {
-            printf(__('<a href="%s" target="_blank" >%s</a> imported successfully.', MPSL_TEXTDOMAIN), $upload['url'], $file_name) . "<br />";
+            printf(__('<a href="%s" target="_blank" >%s</a> imported successfully.', 'motopress-slider'), $upload['url'], $file_name) . "<br />";
             echo '<br/>';
         }
         
@@ -329,7 +370,7 @@ class MPSLSliderImporter {
 
         if (wp_remote_retrieve_response_code($response) != '200' ) {
             @unlink( $upload['file'] );
-            return new WP_Error( 'import_file_error', sprintf( __('Remote server returned error response %1$d %2$s', MPSL_TEXTDOMAIN), esc_html( wp_remote_retrieve_response_code($response) ), get_status_header_desc( wp_remote_retrieve_response_code($response) ) ) );
+            return new WP_Error( 'import_file_error', sprintf( __('Remote server returned error response %1$d %2$s', 'motopress-slider'), esc_html( wp_remote_retrieve_response_code($response) ), get_status_header_desc( wp_remote_retrieve_response_code($response) ) ) );
         }
         
         // Write file
@@ -337,7 +378,7 @@ class MPSLSliderImporter {
         
         if ( !$out_fp ) {
             @unlink( $upload['file'] );
-            return new WP_Error( 'import_file_error', __('Unable to write to file.', MPSL_TEXTDOMAIN) );
+            return new WP_Error( 'import_file_error', __('Unable to write to file.', 'motopress-slider') );
         }            
 	fwrite( $out_fp,  wp_remote_retrieve_body( $response ) );
 	fclose($out_fp);
@@ -346,12 +387,12 @@ class MPSLSliderImporter {
         $filesize = filesize( $upload['file'] );
         if ( isset( $headers['content-length'] ) && $filesize != $headers['content-length'] ) {            
             @unlink( $upload['file'] );
-            return new WP_Error( 'import_file_error', __('Remote file is incorrect size', MPSL_TEXTDOMAIN) );
+            return new WP_Error( 'import_file_error', __('Remote file is incorrect size', 'motopress-slider') );
         }
 
         if ( 0 == $filesize ) {
             @unlink( $upload['file'] );
-            return new WP_Error( 'import_file_error', __('Zero size file downloaded', MPSL_TEXTDOMAIN) );
+            return new WP_Error( 'import_file_error', __('Zero size file downloaded', 'motopress-slider') );
         }                        
 
         return $upload;
@@ -359,11 +400,11 @@ class MPSLSliderImporter {
     
     private function createFileInUploads( $name ) {
         if ( empty( $name ) )
-            return array('error' => __( 'Empty filename', MPSL_TEXTDOMAIN ));
+            return array('error' => __( 'Empty filename', 'motopress-slider' ));
 
         $wp_filetype = wp_check_filetype( $name );
         if ( ! $wp_filetype['ext'] && ! current_user_can( 'unfiltered_upload' ) )
-            return array('error' => __('Invalid file type', MPSL_TEXTDOMAIN));
+            return array('error' => __('Invalid file type', 'motopress-slider'));
 
         $upload = wp_upload_dir();
         if ( $upload['error'] !== false )
@@ -374,13 +415,13 @@ class MPSLSliderImporter {
         $new_file = $upload_path . "/$filename";            
 
         if ( !wp_mkdir_p($upload_path) ) {            
-            $message = sprintf( __( 'Unable to create directory %s. Is its parent directory writable by the server?', MPSL_TEXTDOMAIN ), dirname($upload_path) );
+            $message = sprintf( __( 'Unable to create directory %s. Is its parent directory writable by the server?', 'motopress-slider' ), dirname($upload_path) );
             return array( 'error' => $message );
         }
 
         $isFileWritten = $this->writeFile($new_file);
         if (!$isFileWritten) 
-            return array( 'error' => sprintf( __( 'Could not write file %s', MPSL_TEXTDOMAIN ), $new_file ) );        
+            return array( 'error' => sprintf( __( 'Could not write file %s', 'motopress-slider' ), $new_file ) );
         
         $url = $this->mpslUploadsUrl . '/' . $filename;
 

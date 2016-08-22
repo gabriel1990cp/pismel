@@ -5,6 +5,7 @@ include_once dirname(__FILE__) . '/OptionsFactory.php';
 abstract class MPSLOptions {
     protected $pluginDir;
     protected $options = null;
+	private $dependencyTypes = array('dependency', 'disabled_dependency');
 
     public function __construct() {
         global $mpsl_settings;
@@ -24,19 +25,54 @@ abstract class MPSLOptions {
                 $options[$grpName]['options'][$optName]['name'] = $optName;
 	            $options[$grpName]['options'][$optName]['unit'] = array_key_exists('unit', $opt) ? $opt['unit'] : '';
 	            $options[$grpName]['options'][$optName]['value'] = array_key_exists('default', $opt) ? $opt['default'] : '';
+                $options[$grpName]['options'][$optName]['hidden'] = isset($opt['hidden']) ? $opt['hidden'] : false;
+
+	            foreach ($this->dependencyTypes as $depType) {
+		            if (array_key_exists($depType, $opt)) {
+			            // remove dep if empty
+			            if (!count($opt[$depType])) {
+				            unset($options[$grpName]['options'][$optName][$depType]);
+				            continue;
+			            }
+
+			            // fix operator
+			            if (array_key_exists('operator', $opt[$depType])) {
+				            $opt[$depType]['operator'] = strtoupper($opt[$depType]['operator']);
+			            } else {
+				            $opt[$depType]['operator'] = 'IN';
+			            }
+
+			            // value to array + sort
+			            if (is_array($opt[$depType]['value'])) {
+				            sort($opt[$depType]['value']);
+			            } else {
+				            $opt[$depType]['value'] = array($opt[$depType]['value']);
+			            }
+
+			            // bool to int
+			            foreach ($opt[$depType]['value'] as &$val) {
+				            if (is_bool($val)) $val = (int)$val;
+			            }
+
+			            // update dependency
+			            $options[$grpName]['options'][$optName][$depType] = $opt[$depType];
+		            }
+	            }
 
                 if (array_key_exists('options', $opt)) {
+					$skipChild = isset($opt['skipChild']) && $opt['skipChild'];
                     foreach ($options[$grpName]['options'][$optName]['options'] as $childOptName => $childOpt) {
                         $options[$grpName]['options'][$optName]['options'][$childOptName]['isChild'] = true;
                         $options[$grpName]['options'][$optName]['options'][$childOptName]['group'] = $grpName;
                         $options[$grpName]['options'][$optName]['options'][$childOptName]['name'] = $childOptName;
 	                    $options[$grpName]['options'][$optName]['options'][$childOptName]['unit'] = array_key_exists('unit', $childOpt) ? $childOpt['unit'] : '';
                         $options[$grpName]['options'][$optName]['options'][$childOptName]['value'] = $childOpt['default'];
-	                    if (!array_key_exists('dependency', $childOpt) && array_key_exists('dependency', $opt)) {
-		                    $options[$grpName]['options'][$optName]['options'][$childOptName]['dependency'] = $opt['dependency'];
-	                    }
-	                    if (!array_key_exists('disabled_dependency', $childOpt) && array_key_exists('disabled_dependency', $opt)) {
-		                    $options[$grpName]['options'][$optName]['options'][$childOptName]['disabled_dependency'] = $opt['disabled_dependency'];
+						$options[$grpName]['options'][$optName]['options'][$childOptName]['skip'] = $skipChild;
+
+	                    foreach ($this->dependencyTypes as $depType) {
+		                    if (!array_key_exists($depType, $childOpt) && array_key_exists($depType, $opt) && count($opt[$depType])) {
+			                    $options[$grpName]['options'][$optName]['options'][$childOptName][$depType] = $opt[$depType];
+		                    }
 	                    }
                     }
                 }

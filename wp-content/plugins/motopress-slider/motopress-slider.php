@@ -3,14 +3,17 @@
 Plugin Name: MotoPress Slider
 Plugin URI: http://www.getmotopress.com/plugins/slider/
 Description: Responsive MotoPress Slider for your WordPress theme. This plugin is all you need for creating beautiful slideshows, smooth transitions, effects and animations. Easy navigation, intuitive interface and responsive layout.
-Version: 1.2.3
+Version: 1.3.3
 Author: MotoPress
 Author URI: http://www.getmotopress.com/
+Text Domain: motopress-slider
+Domain Path: /lang
 License: GPLv2 or later
 */
 if (!defined('ABSPATH')) exit;
 
 include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+
 
 if(!is_plugin_active('motopress-slider-lite/motopress-slider.php')) {
 
@@ -24,6 +27,7 @@ if (version_compare($wp_version, '3.9', '<') && isset($network_plugin)) {
 $mpsl_plugin_dir_path = plugin_dir_path($mpsl_plugin_file);
 
 require_once $mpsl_plugin_dir_path . 'includes/php-core-functions.php';
+require_once $mpsl_plugin_dir_path . 'includes/functions.php';
 require_once $mpsl_plugin_dir_path . 'settings/settings.php';
 require_once $mpsl_plugin_dir_path . 'includes/classes/Sharing.php';
 require_once $mpsl_plugin_dir_path . 'includes/classes/MPSLDB.php';
@@ -40,8 +44,7 @@ require_once $mpsl_plugin_dir_path . 'includes/classes/VimeoOEmbedApi.php';
 require_once $mpsl_plugin_dir_path . 'includes/classes/SliderPreview.php';
 require_once $mpsl_plugin_dir_path . 'includes/classes/SliderWidget.php';
 
-if (is_admin()) {
-    require_once $mpsl_plugin_dir_path . 'includes/functions.php';
+    if (is_admin()) {
     require_once $mpsl_plugin_dir_path . 'includes/classes/AdminSharing.php';
     require_once $mpsl_plugin_dir_path . 'includes/classes/License.php';
     require_once $mpsl_plugin_dir_path . 'includes/classes/PluginOptions.php';
@@ -56,7 +59,8 @@ class MPSLAdmin {
     public $pageController;
 
     private $mpsl_settings;
-    private $isPluginPage;
+//    private $isPluginPage;
+    public $isPluginPage;
     private $view;
     private $menuHook;
 	
@@ -77,7 +81,7 @@ class MPSLAdmin {
         $this->initLicenseController();
         $this->initPluginOptionsController();
         $this->addActions();
-        $this->initPageController();
+//        $this->initPageController();
     }
 
     private function initPageController(){
@@ -85,9 +89,9 @@ class MPSLAdmin {
             switch($this->view) {
                 case 'slider' :
 //                    require_once $this->pluginDir . 'includes/classes/SliderOptions.php';
-                    $id = isset($_GET['id']) ? $_GET['id'] : null;
+                    $id = isset($_GET['id']) ? (int) $_GET['id'] : null;
                     if (!is_null($id) && !MPSLSliderOptions::isIdExists($id)) {
-                        wp_die(sprintf(__('Slider with id %s is not exists!', MPSL_TEXTDOMAIN), $id));
+                        wp_die(sprintf(__('Slider with id %s is not exists!', 'motopress-slider'), $id));
                     }
                     $slider = new MPSLSliderOptions($id);
                     $this->pageController = $slider;
@@ -113,8 +117,9 @@ class MPSLAdmin {
                     $this->pageController = $slider;
                     break;
                 case 'export' :
-                    add_action('admin_init', array($this, 'exportSliders'));
-                    break;
+//                    add_action('admin_init', array($this, 'exportSliders'));
+                    $this->exportSliders();
+                break;
 	            case 'sliders': default:
                     $sliders = new MPSLSlidersList();
                     $this->pageController = $sliders;
@@ -144,6 +149,7 @@ class MPSLAdmin {
 
     public static function install($network_wide){
         global $wpdb;
+
 
 	    
         $autoLicenseKey = apply_filters('mpsl_auto_license_key', false);
@@ -183,8 +189,13 @@ class MPSLAdmin {
         return $tables;
     }
 
-    public static function createTables(){
+    public static function createTables() {
         global $wpdb;
+
+	    $charsetCollate = '';
+	    if (!empty($wpdb->charset)) $charsetCollate = "DEFAULT CHARACTER SET {$wpdb->charset}";
+	    if (!empty($wpdb->collate)) $charsetCollate .= " COLLATE {$wpdb->collate}";
+
         $slidersTableRes = $wpdb->query(sprintf(
             'CREATE TABLE IF NOT EXISTS %s (
                 id int(9) NOT NULL AUTO_INCREMENT,
@@ -192,12 +203,13 @@ class MPSLAdmin {
                 alias tinytext NULL,
                 options text NOT NULL,
                 PRIMARY KEY (id)
-            ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;',
-            $wpdb->prefix . self::SLIDERS_TABLE
+            ) %s;',
+            $wpdb->prefix . self::SLIDERS_TABLE,
+	        $charsetCollate
         ));
         if (!$slidersTableRes) {
             //@todo show error message
-//            MPSLMessages::error(printf(__('Table %1$s', MPSL_TEXTDOMAIN), $this->mpsl_settings['sliders_table']));
+//            MPSLMessages::error(printf(__('Table %1$s', 'motopress-slider'), $this->mpsl_settings['sliders_table']));
         }
 
         $slidesTableRes = $wpdb->query(sprintf(
@@ -208,8 +220,9 @@ class MPSLAdmin {
                 options text NOT NULL,
                 layers text NOT NULL,
                 PRIMARY KEY (id)
-            ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;',
-            $wpdb->prefix . self::SLIDES_TABLE
+            ) %s;',
+            $wpdb->prefix . self::SLIDES_TABLE,
+	        $charsetCollate
         ));
         if (!$slidesTableRes) {
             //@todo show error message
@@ -223,8 +236,9 @@ class MPSLAdmin {
                 options text NOT NULL,
                 layers text NOT NULL,
                 PRIMARY KEY (id)
-            ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;',
-            $wpdb->prefix . self::SLIDES_PREVIEW_TABLE
+            ) %s;',
+            $wpdb->prefix . self::SLIDES_PREVIEW_TABLE,
+	        $charsetCollate
         ));
         if (!$slidesPreviewTableRes) {
             //@todo show error message
@@ -237,8 +251,9 @@ class MPSLAdmin {
                 alias tinytext NULL,
                 options text NOT NULL,
                 PRIMARY KEY (id)
-            ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;',
-            $wpdb->prefix . self::SLIDERS_PREVIEW_TABLE
+            ) %s;',
+            $wpdb->prefix . self::SLIDERS_PREVIEW_TABLE,
+	        $charsetCollate
         ));
 
         if (!$slidersPreviewTableRes) {
@@ -277,8 +292,11 @@ class MPSLAdmin {
     }*/
 
     public function adminInit() {
+        $this->initPageController();
+
+        // Updater
         global $mpsl_settings;
-        register_importer( 'mpsl-importer', $mpsl_settings['product_name'], sprintf(__( 'Import sliders and images from a %s export file.', MPSL_TEXTDOMAIN ), $mpsl_settings['product_name']), array( $this, 'importPageRender' ) );
+        register_importer( 'mpsl-importer', $mpsl_settings['product_name'], sprintf(__( 'Import sliders and images from a %s export file.', 'motopress-slider' ), $mpsl_settings['product_name']), array( $this, 'importPageRender' ) );
         if (!empty($_GET['mpsl_do_update'])) {
             include_once($this->pluginDir . 'includes/update.php');
             mpslDoUpdate();
@@ -299,9 +317,14 @@ class MPSLAdmin {
     private function addActions(){
         global $mpsl_settings;
 
+	    add_filter('tiny_mce_before_init', array($this, 'mpslTinyMceBeforeInit'), 10, 2);
         add_filter('after_wp_tiny_mce', array($this, 'regSliderListObj'));
         add_filter('mce_external_plugins', array($this, 'regSliderListPlugin'));
         add_filter('mce_buttons', array($this, 'regSliderListButton'));
+        if ($this->isPluginPage) {
+            add_filter('wp_default_editor', array($this, 'wpDefaultEditor'));
+        }
+
 
         add_action('admin_menu', array($this, 'mpslMenu'), 11);
         if ($mpsl_settings['plugin_version'] && get_option('mpsl_version') != $mpsl_settings['plugin_version']) {
@@ -326,11 +349,33 @@ class MPSLAdmin {
         add_action('wp_ajax_mpsl_check_alias_exists', array($this, 'checkAliasExistsCallback'));
         add_action('wp_ajax_mpsl_get_youtube_thumbnail', array($this, 'getYoutubeThumbnailCallback'));
         add_action('wp_ajax_mpsl_get_vimeo_thumbnail', array($this, 'getVimeoThumbnailCallback'));
+
+        add_action('wp_ajax_mpsl_posts_preview', array($this, 'postsPreviewCallback'));
     }
+
+    public function wpDefaultEditor($ed) {
+        return 'tinymce';
+    }
+
+	public static function mpslTinyMceBeforeInit($settings, $editorId) {
+		global $mpsl_settings;
+
+		// HTML Layer content
+		if ($editorId === $mpsl_settings['alt_prefix'] . 'text') {
+			$settings = array_merge($settings, array(
+				'wpautop' => false,
+				'force_br_newlines' => true,
+				'force_p_newlines' => false,
+				'forced_root_block' => ''
+			));
+		}
+
+		return $settings;
+	}
 
     public function regSliderListObj(){
         $mpslLang = array(
-            'title' => __('Slider', MPSL_TEXTDOMAIN)
+            'title' => __('Slider', 'motopress-slider')
         );
 
         $sliders = new MPSLSlidersList();
@@ -340,11 +385,13 @@ class MPSLAdmin {
     public function regSliderListPlugin($plugin_array){
         global $mpsl_settings;
         $plugin_array['mpslTinymceSliderList'] = $mpsl_settings['plugin_dir_url'] . 'js/tinymce-button.js';
+        $plugin_array['mpslTinymceMacrosList'] = $mpsl_settings['plugin_dir_url'] . 'js/macros-select.js';
         return $plugin_array;
     }
 
     public function regSliderListButton($buttons) {
         array_push($buttons, 'mpsl_slider_list_btn');
+        array_push($buttons, 'mpsl_post_macros');
         return $buttons;
     }
 
@@ -489,11 +536,13 @@ class MPSLAdmin {
             }
 
             if ($page === 'slide') {
+                $jsVars['Vars']['slider'] = $this->pageController->slider->getOptions();
 	            $jsVars['Vars']['layer'] = array(
 		            'list' => $this->pageController->getLayers(),
 		            'grouped_options' => $this->pageController->getLayerOptions(true),
 		            'options' => $this->pageController->getLayerOptions(),
-		            'defaults' => $this->pageController->getOptionsDefaults('layer')
+		            'defaults' => $this->pageController->getOptionsDefaults('layer'),
+		            'white_space_class_prefix' => MPSLSlideOptions::LAYER_WHITE_SPACE_CLASS_PREFIX
 	            );
 	            $jsVars['Vars']['preset'] = array(
 		            'default_list' => $this->pageController->layerPresets->getDefaultPresets(),
@@ -510,64 +559,112 @@ class MPSLAdmin {
 	            );
             }
 
-            wp_localize_script("mpsl-$page", 'MPSL', $jsVars);
+            //wp_localize_script("mpsl-$page", 'MPSL', $jsVars);
+            wp_localize_script("jquery", 'MPSL', $jsVars);
         }
     }
 
     private function getLangStrings(){
         global $mpsl_settings;
         return array(
-            'test' => __('test', MPSL_TEXTDOMAIN),
-            'emptyInputError' => __('%s require non empty value.', MPSL_TEXTDOMAIN),
-            'ajax_result_not_found' => __('In the AJAX response undisclosed result field.', MPSL_TEXTDOMAIN),
-            'validate_digitals_only' => __('%s must content digitals only.', MPSL_TEXTDOMAIN),
-            'validate_less_min' => __('%s could not be less then %d', MPSL_TEXTDOMAIN),
-            'validate_greater_max' => __('%s could not be greater then %d', MPSL_TEXTDOMAIN),
-            'aliasNotValidPattern' => __('Alias not valid. Alias could contents latin symbols, numbers, underscore and hyphen only.', MPSL_TEXTDOMAIN),
-            'aliasAlreadyExists' => __('This alias already exists. Alias must be unique.', MPSL_TEXTDOMAIN),
-            'validate_invalid_date_format' => __('"%s" invalid date format. Use datepicker.', MPSL_TEXTDOMAIN),
-            'validate_invalid_day' => __('"%s" invalid value for day: %day.', MPSL_TEXTDOMAIN),
-            'validate_invalid_month' => __('"%s" invalid value for month: %month.', MPSL_TEXTDOMAIN),
-            'validate_invalid_year' => __('"%s" Invalid value for year: %year - must be between %minYear and %maxYear.', MPSL_TEXTDOMAIN),
-            'validate_invalid_hour' => __('"%s" invalid value for hour: %hour.', MPSL_TEXTDOMAIN),
-            'validate_invalid_minute' => __('"%s" invalid value for minute: %minute.', MPSL_TEXTDOMAIN),
-            'delete' => __('Delete', MPSL_TEXTDOMAIN),
-            'cancel' => __('Cancel', MPSL_TEXTDOMAIN),
-            'choose' => __('Choose', MPSL_TEXTDOMAIN),
-            'none' => __('None', MPSL_TEXTDOMAIN),
+            'test' => __('test', 'motopress-slider'),
+            'emptyInputError' => __('%s require non empty value.', 'motopress-slider'),
+            'ajax_result_not_found' => __('In the AJAX response undisclosed result field.', 'motopress-slider'),
+            'validate_digitals_only' => __('%s must content digitals only.', 'motopress-slider'),
+            'validate_less_min' => __('%s could not be less then %d', 'motopress-slider'),
+            'validate_greater_max' => __('%s could not be greater then %d', 'motopress-slider'),
+            'aliasNotValidPattern' => __('Alias not valid. Alias could contents latin symbols, numbers, underscore and hyphen only.', 'motopress-slider'),
+            'aliasAlreadyExists' => __('This alias already exists. Alias must be unique.', 'motopress-slider'),
+            'validate_invalid_date_format' => __('"%s" invalid date format. Use datepicker.', 'motopress-slider'),
+            'validate_invalid_day' => __('"%s" invalid value for day: %day.', 'motopress-slider'),
+            'validate_invalid_month' => __('"%s" invalid value for month: %month.', 'motopress-slider'),
+            'validate_invalid_year' => __('"%s" Invalid value for year: %year - must be between %minYear and %maxYear.', 'motopress-slider'),
+            'validate_invalid_hour' => __('"%s" invalid value for hour: %hour.', 'motopress-slider'),
+            'validate_invalid_minute' => __('"%s" invalid value for minute: %minute.', 'motopress-slider'),
+            'delete' => __('Delete', 'motopress-slider'),
+            'cancel' => __('Cancel', 'motopress-slider'),
+            'choose' => __('Choose', 'motopress-slider'),
+            'none' => __('None', 'motopress-slider'),
 
-            'slider_updated' => __('Slider updated.', MPSL_TEXTDOMAIN),
-            'slider_update_error' =>  __('Slider update error:', MPSL_TEXTDOMAIN),
-            'slider_created' => __('Slider is created', MPSL_TEXTDOMAIN),
-            'slider_deleted' => __('Slider is deleted.', MPSL_TEXTDOMAIN),
-            'slider_deleted_id' => __('Slider %d deleted.', MPSL_TEXTDOMAIN),
-            'slider_duplicated' => __('Slider duplicated.', MPSL_TEXTDOMAIN),
-            'slider_want_delete_single' => __('Do you really want to delete \'%d\' ?', MPSL_TEXTDOMAIN),
+            'slider_updated' => __('Slider updated.', 'motopress-slider'),
+            'slider_update_error' =>  __('Slider update error:', 'motopress-slider'),
+            'slider_created' => __('Slider is created', 'motopress-slider'),
+            'slider_deleted' => __('Slider is deleted.', 'motopress-slider'),
+            'slider_deleted_id' => __('Slider %d deleted.', 'motopress-slider'),
+            'slider_duplicated' => __('Slider duplicated.', 'motopress-slider'),
+            'slider_want_delete_single' => __('Do you really want to delete \'%d\' ?', 'motopress-slider'),
 
-            'slide_created' => __('Slide created.', MPSL_TEXTDOMAIN),
-            'slide_created_error' => __('Slide is not created.', MPSL_TEXTDOMAIN),
-            'slide_updated' => __('Slide updated.', MPSL_TEXTDOMAIN),
-            'slide_update_error' => __('Slide update error: ', MPSL_TEXTDOMAIN),
-            'slide_deleted' => __('Slide deleted.', MPSL_TEXTDOMAIN),
-            'slide_duplicated' => __('Slide duplicated.', MPSL_TEXTDOMAIN),
-            'slide_want_delete_single' => __('Do you really want to delete \'%d\' ?', MPSL_TEXTDOMAIN),
+            'slide_created' => __('Slide created.', 'motopress-slider'),
+            'slide_created_error' => __('Slide is not created.', 'motopress-slider'),
+            'slide_updated' => __('Slide updated.', 'motopress-slider'),
+            'slide_update_error' => __('Slide update error: ', 'motopress-slider'),
+            'slide_deleted' => __('Slide deleted.', 'motopress-slider'),
+            'slide_duplicated' => __('Slide duplicated.', 'motopress-slider'),
+            'slide_want_delete_single' => __('Do you really want to delete \'%d\' ?', 'motopress-slider'),
 
-            'slides_sorted' => __('Slides sorted', MPSL_TEXTDOMAIN),
-            'slides_sorted_error' => __('Slides error when sorting', MPSL_TEXTDOMAIN),
+            'slides_sorted' => __('Slides sorted', 'motopress-slider'),
+            'slides_sorted_error' => __('Slides error when sorting', 'motopress-slider'),
 
-            'layer_want_delete_all' => __('Do you really want to delete all the layers?', MPSL_TEXTDOMAIN),
-            'import_export_dialog_title' => sprintf(__('%s Import and Export', MPSL_TEXTDOMAIN), $mpsl_settings['product_name']),
-            'preview_dialog_title' => __('Preview slider', MPSL_TEXTDOMAIN),
-            'no_sliders_selected_to_export' => __('No sliders selected to export.', MPSL_TEXTDOMAIN),
-            'style_editor_dialog_title' => __('Style Editor', MPSL_TEXTDOMAIN),
-            'style_editor_dialog_presets_title' => __('Presets', MPSL_TEXTDOMAIN),
+            'layer_want_delete_all' => __('Do you really want to delete all the layers?', 'motopress-slider'),
+            'import_export_dialog_title' => sprintf(__('%s Import and Export', 'motopress-slider'), $mpsl_settings['product_name']),
+            'template_dialog_title' => __('Create New Slider', 'motopress-slider'),
+            'preview_dialog_title' => __('Preview slider', 'motopress-slider'),
+            'no_sliders_selected_to_export' => __('No sliders selected to export.', 'motopress-slider'),
+            'style_editor_dialog_title' => __('Style Editor', 'motopress-slider'),
+            'style_editor_dialog_presets_title' => __('Presets', 'motopress-slider'),
 
-            'layer_preset_delete' => __('Do you really want to delete preset "%s"?', MPSL_TEXTDOMAIN),
-            'layer_preset_rename' => __('Rename preset', MPSL_TEXTDOMAIN),
-            'layer_preset_enter_name' => __('Please enter name for new preset', MPSL_TEXTDOMAIN),
-            'layer_preset_not_selected' => __('No preset selected', MPSL_TEXTDOMAIN),
-            'layer_preset_private_name' => __('Element Style', MPSL_TEXTDOMAIN),
-            'layer_preset_default_name' => __('New preset', MPSL_TEXTDOMAIN),
+            'animation-modal' => __('Transition Editor', 'motopress-slider'),
+
+            'layer_preset_delete' => __('Do you really want to delete preset "%s"?', 'motopress-slider'),
+            'layer_preset_rename' => __('Rename preset', 'motopress-slider'),
+            'layer_preset_enter_name' => __('Please enter name for new preset', 'motopress-slider'),
+            'layer_preset_not_selected' => __('No preset selected', 'motopress-slider'),
+            'layer_preset_private_name' => __('Element Style', 'motopress-slider'),
+            'layer_preset_default_name' => __('New preset', 'motopress-slider'),
+
+	        'macros' => array(
+		        'general' => array(
+			        'post_content' => 'Post Content',
+			        'woo_content' => 'WooCommerce Content',
+		        ),
+		        'post' => array(
+			        'title' => __('The post title', 'motopress-slider'),
+					'content' => __('The post content', 'motopress-slider'),
+					'excerpt' => __('The post excerpt', 'motopress-slider'),
+					'categories' => __('The post categories', 'motopress-slider'),
+					'tags' => __('The post tags', 'motopress-slider'),
+					'link' => __('The post link', 'motopress-slider'),
+					'author_name' => __('The author name', 'motopress-slider'),
+					'unique_id' => __('The unique ID of the post', 'motopress-slider'),
+					'image' => __('Post image', 'motopress-slider'),
+					'image_source' => __('Post image source', 'motopress-slider'),
+					'year' => __('The year of the post', 'motopress-slider'),
+					'numeric_month' => __('Numeric Month', 'motopress-slider'),
+					'month_name' => __('Month name', 'motopress-slider'),
+					'day_of_month' => __('Day of the month', 'motopress-slider'),
+					'weekday_name' => __('Weekday name', 'motopress-slider'),
+					'hour_minutes' => __('Hour:Minutes', 'motopress-slider'),
+					'publish_date' => __('The publish date', 'motopress-slider'),
+					'last_modified_date' => __('The last modified date', 'motopress-slider'),
+					'number_of_comments' => __('Number of comments', 'motopress-slider')
+		        ),
+		        'woo' => array(
+			        'add_to_cart' => __('Add To Cart', 'motopress-slider'),
+					'price' => __('Price', 'motopress-slider'),
+					'currency' => __('Currency', 'motopress-slider'),
+					'currency_price' => __('Currency + Price', 'motopress-slider'),
+					'regular_price' => __('Regular Price', 'motopress-slider'),
+					'sale_price' => __('Sale Price', 'motopress-slider'),
+					'in_stock_status' => __('In Stock Status', 'motopress-slider'),
+			        'in_stock_quantity' => __('In Stock Quantity', 'motopress-slider'),
+					'weight' => __('Weight', 'motopress-slider'),
+					'product_categories' => __('Product Categories', 'motopress-slider'),
+					'product_tags' => __('Product Tags', 'motopress-slider'),
+					'total_sales' => __('Total Sales', 'motopress-slider'),
+					'average_rating' => __('Average Rating', 'motopress-slider'),
+					'rating_count' => __('Rating Count', 'motopress-slider')
+		        )
+	        )
         );
     }
 
@@ -580,7 +677,8 @@ class MPSLAdmin {
         global $mpsl_settings;
         $isHideMenu = apply_filters('mpsl_hide_menu', false);
         if (!isMPSLDisabledForCurRole() && !$isHideMenu) {
-            $this->menuHook = add_menu_page($mpsl_settings['product_name'], $mpsl_settings['product_name'], 'read', $this->mpsl_settings['plugin_name'], array($this, 'renderPage'), "dashicons-slides");
+			$menu_icon = (version_compare( $GLOBALS['wp_version'], '3.8', '<' )) ? '' : 'dashicons-slides';
+            $this->menuHook = add_menu_page($mpsl_settings['product_name'], $mpsl_settings['product_name'], 'read', $this->mpsl_settings['plugin_name'], array($this, 'renderPage'), $menu_icon);
             $isHideOptionsMenu = apply_filters('mpsl_hide_options_page', false);
             if (!$isHideOptionsMenu) {
                 $this->pluginOptionsController->addMenu();
@@ -615,11 +713,46 @@ class MPSLAdmin {
     }
 
     // AJAX Callbacks
+
+    public function postsPreviewCallback() {
+        $options = isset($_POST['options']) ? json_decode(stripslashes($_POST['options']), true) : null;
+        $type = isset($_POST['type']) ? $_POST['type'] : null;
+        if ($options) {
+            $db = MPSliderDB::getInstance();
+	        $_posts = array();
+	        $charLength = (!empty($options['post_excerpt_length'])) ? $options['post_excerpt_length'] : 0;
+
+	        MPSLSharing::disableShortcodeRendering();
+
+            $posts = $db->getPostsByOptions($options, $type);
+	        if ($posts->have_posts()) {
+		        while ($posts->have_posts()) {
+			        $posts->the_post();
+			        $_posts[] = array(
+				        'ID' => get_the_ID(),
+				        'title' => get_the_title(),
+				        'url' => get_permalink(),
+				        'image' => $db->getPostImageThumbnail($posts->post),
+				        'excerpt' => $db->getExcerpt($posts->post, $charLength),
+				        'date' => $db->getFormatDate('F j, Y', $posts->post)
+			        );
+		        }
+	        }
+	        wp_reset_postdata();
+
+	        MPSLSharing::enableShortcodeRendering();
+
+            wp_send_json(array('result' => true, 'posts' => $_posts));
+        }
+
+	    wp_send_json(array('result' => false));
+    }
+
     public function updateSliderCallback() {
         mpslVerifyNonce();
         // Prepare data
         $preview = (isset($_POST['preview']) && $_POST['preview'] == 'true') ? true : false;
-        $id = isset($_POST['id']) ? $_POST['id'] : null;
+        $id = isset($_POST['id']) ? (int) $_POST['id'] : null;
         if (isset($_POST['options'])) {
             $options = stripslashes($_POST['options']);
             $options = json_decode($options, true);
@@ -647,15 +780,15 @@ class MPSLAdmin {
                     wp_send_json(array('result' => true, 'id' => $slider->getId()));
                 } else {
                     global $wpdb;
-                    mpslSetError(__('Slider is not updated. Error: ', MPSL_TEXTDOMAIN) . $wpdb->last_error);
+                    mpslSetError(__('Slider is not updated. Error: ', 'motopress-slider') . $wpdb->last_error);
                 }
             } else {
-                mpslSetError(__('This alias already exists. Alias must be unique.', MPSL_TEXTDOMAIN));
+                mpslSetError(__('This alias already exists. Alias must be unique.', 'motopress-slider'));
             }
         } else {
-            mpslSetError(__('Id is not set.', MPSL_TEXTDOMAIN));
+            mpslSetError(__('Id is not set.', 'motopress-slider'));
         }
-}
+	}
 
     public function createSliderCallback(){
         mpslVerifyNonce();
@@ -666,22 +799,26 @@ class MPSLAdmin {
             $options = array();
         }
         require_once $this->pluginDir . 'includes/classes/SliderOptions.php';
-        $slider = new MPSLSliderOptions();
-        $slider->overrideOptions($options, true);
+//        $slider = new MPSLSliderOptions();
+        $slider = new MPSLSliderOptions(array(
+	        'grouped' => true,
+	        'options' => $options
+        ));
+//        $slider->overrideOptions($options, true);
         if (!$slider->isAliasExists($slider->getAlias())) {
             if(!$slider->isNotValidOptions()){
                 $id = $slider->create();
-                if (false !== $id) {
-                    wp_send_json(array('result' => true, 'id' => $slider->getId()));
+                if ($id) {
+                    wp_send_json(array('result' => true, 'id' => $slider->getId(), 'template_id' => $slider->getTemplateId()));
                 } else {
                     global $wpdb;
-                    mpslSetError(__('Slider is not updated. Error: ', MPSL_TEXTDOMAIN) . $wpdb->last_error);
+                    mpslSetError(__('Slider is not updated. Error: ', 'motopress-slider') . $wpdb->last_error);
                 }
             } else {
-                mpslSetError(__('Slider parameters are not valid.', MPSL_TEXTDOMAIN));
+                mpslSetError(__('Slider parameters are not valid.', 'motopress-slider'));
             }
         } else {
-            mpslSetError(__('This alias already exists. Alias must be unique.', MPSL_TEXTDOMAIN));
+            mpslSetError(__('This alias already exists. Alias must be unique.', 'motopress-slider'));
         }
 
     }
@@ -690,17 +827,17 @@ class MPSLAdmin {
         mpslVerifyNonce();
         if (isset($_POST['id'])) {
             require_once $this->pluginDir . 'includes/classes/SliderOptions.php';
-            $slider = new MPSLSliderOptions($_POST['id']);
+            $slider = new MPSLSliderOptions((int) $_POST['id']);
             $error = null;
             $result = $slider->delete();
             if (false !== $result) {
                 wp_send_json(array('result' => true));
             } else {
                 global $wpdb;
-                mpslSetError(__('Slider is not deleted. Error: ', MPSL_TEXTDOMAIN) . $wpdb->last_error);
+                mpslSetError(__('Slider is not deleted. Error: ', 'motopress-slider') . $wpdb->last_error);
             }
         } else {
-            mpslSetError(__('Slider is not deleted. ID is not set.', MPSL_TEXTDOMAIN));
+            mpslSetError(__('Slider is not deleted. ID is not set.', 'motopress-slider'));
         }
     }
 
@@ -708,7 +845,7 @@ class MPSLAdmin {
         mpslVerifyNonce();
         if (isset($_POST['id'])) {
 	        $layerPresetsObj = MPSLLayerPresetOptions::getInstance();
-            $slider = new MPSLSliderOptions($_POST['id']);
+            $slider = new MPSLSliderOptions((int) $_POST['id']);
             $error = null;
             $slideRes = $slider->duplicate();
 
@@ -723,10 +860,10 @@ class MPSLAdmin {
                 wp_send_json(array('result' => true, 'id' => $id, 'html' => $html));
             } else {
                 global $wpdb;
-                mpslSetError(__('Slider is not duplicated. Error: ', MPSL_TEXTDOMAIN) . $wpdb->last_error);
+                mpslSetError(__('Slider is not duplicated. Error: ', 'motopress-slider') . $wpdb->last_error);
             }
         } else {
-            mpslSetError(__('Slider is not duplicated. Slider ID is not set.', MPSL_TEXTDOMAIN));
+            mpslSetError(__('Slider is not duplicated. Slider ID is not set.', 'motopress-slider'));
         }
     }
 
@@ -795,14 +932,14 @@ class MPSLAdmin {
             } else {
                 global $wpdb;
 	            if ($preview) {
-		            mpslSetError(__('Slider can\'t be previewed. Error: ', MPSL_TEXTDOMAIN) . $wpdb->last_error);
+		            mpslSetError(__('Slider can\'t be previewed. Error: ', 'motopress-slider') . $wpdb->last_error);
 	            } else {
-		            mpslSetError(__('Slide is not updated. Error: ', MPSL_TEXTDOMAIN) . $wpdb->last_error);
+		            mpslSetError(__('Slide is not updated. Error: ', 'motopress-slider') . $wpdb->last_error);
 	            }
             }
 
         } else {
-            mpslSetError(__('Slide ID is not set.', MPSL_TEXTDOMAIN));
+            mpslSetError(__('Slide ID is not set.', 'motopress-slider'));
         }
         die();
     }
@@ -816,7 +953,7 @@ class MPSLAdmin {
             wp_send_json(array('result' => $result));
         } else{
             global $wpdb;
-            mpslSetError(__('Slide is not deleted. Error: ', MPSL_TEXTDOMAIN) . $wpdb->last_error);
+            mpslSetError(__('Slide is not deleted. Error: ', 'motopress-slider') . $wpdb->last_error);
         }
         die();
     }
@@ -826,10 +963,19 @@ class MPSLAdmin {
         require_once $this->pluginDir . 'includes/classes/SlideOptions.php';
         if (isset($_POST['slider_id'])) {
             $sliderId = (int) $_POST['slider_id'];
-            $mpsl_options = new MPSLSlideOptions();
-            $mpsl_options->create($sliderId);
+            $slide = new MPSLSlideOptions();
+            $result = $slide->create($sliderId);
+
+            if($result !== false){
+                wp_send_json(array('result' => $result, 'id' => $result));
+            }else{
+                global $wpdb;
+                mpslSetError(__('Slide is not created. Error: ', 'motopress-slider') . $wpdb->last_error);
+            }
+
+
         } else {
-            mpslSetError(__('Slider ID is not set.', MPSL_TEXTDOMAIN));
+            mpslSetError(__('Slider ID is not set.', 'motopress-slider'));
         }
         die();
     }
@@ -843,14 +989,14 @@ class MPSLAdmin {
             $duplicateSlideRes = $slide->duplicateSlide($id);
 //            if ($duplicateSlideRes === 'false') {
 	        if ($duplicateSlideRes === false) {
-	            mpslSetError(__('Slide is not duplicated. Error: ', MPSL_TEXTDOMAIN) . $wpdb->last_error);
+	            mpslSetError(__('Slide is not duplicated. Error: ', 'motopress-slider') . $wpdb->last_error);
 	        } else {
 		        $slide->layerPresets->update();
 		        $slide->layerPresets->updatePrivateStyles();
 		        wp_send_json(array('result' => $duplicateSlideRes, 'id' => $duplicateSlideRes));
 	        }
         } else {
-            mpslSetError(__('Slide ID is not set.', MPSL_TEXTDOMAIN));
+            mpslSetError(__('Slide ID is not set.', 'motopress-slider'));
         }
         die();
     }
@@ -865,10 +1011,10 @@ class MPSLAdmin {
                 wp_send_json(array('result' => true));
             } else {
                 global $wpdb;
-                mpslSetError(__('Slides order update error: ' . $wpdb->last_error, MPSL_TEXTDOMAIN));
+                mpslSetError(__('Slides order update error: ' . $wpdb->last_error, 'motopress-slider'));
             }
         } else {
-            mpslSetError(__('Order is not set.', MPSL_TEXTDOMAIN));
+            mpslSetError(__('Order is not set.', 'motopress-slider'));
         }
         die();
     }
@@ -883,7 +1029,7 @@ class MPSLAdmin {
             }
             wp_send_json(array('result' => $thumbnail));
         } else {
-            mpslSetError(__('YouTube video source not setted.', MPSL_TEXTDOMAIN));
+            mpslSetError(__('YouTube video source not setted.', 'motopress-slider'));
         }
     }
 
@@ -897,7 +1043,7 @@ class MPSLAdmin {
             }
             wp_send_json(array('result' => $thumbnail));
         } else {
-            mpslSetError(__('Vimeo video source not setted.', MPSL_TEXTDOMAIN));
+            mpslSetError(__('Vimeo video source not setted.', 'motopress-slider'));
         }
     }
 
@@ -919,7 +1065,7 @@ class MPSLAdmin {
                 $internalResources = array();
 
                 foreach($_POST['ids'] as $id) {
-                    $slider = new MPSLSliderOptions($id);
+                    $slider = new MPSLSliderOptions((int) $id);
                     $error = null;
                     $slider_data = $slider->getExportSliderData($internalResources);
                     $exportData['sliders'][$id] = $slider_data['slider'];
@@ -971,6 +1117,7 @@ if (is_admin()) {
     add_filter('wpmu_drop_tables', array('MPSLAdmin', 'onDeleteBlog'));
 }
 
+
 //Widget
 add_action('widgets_init', array('MPSLAdmin', 'registerSliderWidget'));
 
@@ -984,7 +1131,7 @@ function mpsl_shortcode($atts){
         'edit_mode' => false
     );
     if ($mp_plugin_active) $defaultAtts = MPCEShortcode::addStyleAtts($defaultAtts);
-    extract(shortcode_atts($defaultAtts, $atts, 'mpsl'));
+    extract(shortcode_atts($defaultAtts, $atts, $mpsl_settings['shortcode_name']));
 
     if ($alias === '') {
         $alias = isset($atts[0]) ? $atts[0] : '';
@@ -996,7 +1143,8 @@ function mpsl_shortcode($atts){
         if (!empty($mp_style_classes)) $mp_style_classes = ' ' . $mp_style_classes;
         $mpAtts = array(
             'mp_style_classes' => $mp_style_classes,
-            'margin' => $margin
+            'margin' => $margin,
+			'mp_custom_style' => isset($mp_custom_style) ? $mp_custom_style : ''
         );
     }
 
@@ -1004,21 +1152,35 @@ function mpsl_shortcode($atts){
 }
 add_shortcode($mpsl_settings['shortcode_name'], 'mpsl_shortcode');
 
-function get_mpsl_slider($alias = '', $edit_mode = false, $slideId = null, $mpAtts = array()){
-    if ($alias) {
-        $slider = new MPSLSliderOptions();
-        $slider->loadByAlias($alias);
+function get_mpsl_slider($alias = '', $edit_mode = false, $slideId = null, $mpAtts = array()) {
+	$result = '';
+    if (!MPSLSharing::isShortcodeRendering() && $alias) {
+	    MPSLSharing::disableShortcodeRendering();
+//		$slider = new MPSLSliderOptions();
+//	    $slider->loadByAlias($alias);
+//        $slider = new MPSLSliderOptions(array('key' => 'alias', 'value' => $alias));
+        $slider = new MPSLSliderOptions((string) $alias);
         $sliderOptions = $slider->getFullSliderData($slideId, $edit_mode);
-        return get_mpsl_slider_by_options($sliderOptions, $edit_mode);
+        $result = get_mpsl_slider_by_options($slider->getId(), $sliderOptions, $edit_mode, $mpAtts);
+	    MPSLSharing::enableShortcodeRendering();
     }
+	return $result;
 }
 
-function get_mpsl_slider_by_options($sliderOptions, $edit_mode = false){
+function get_mpsl_slider_by_options($sliderId, $sliderOptions, $edit_mode = false, $mpAtts = array()) {
+
+	if ($sliderOptions['options']['slider_type'] === 'woocommerce' && !is_plugin_active('woocommerce/woocommerce.php')) {
+		return __('Please install and activate WooCommerce plugin.', 'motopress-slider');
+	}
+
     if (isset($sliderOptions['slides']) && !empty($sliderOptions['slides'])) {
         mpsl_enqueue_core_scripts_styles($edit_mode);
 	    global $mpsl_settings;
         $hasVisibleSlides = false; // will change to true if slider has at least one visible slide .
         ob_start();
+
+        require_once $mpsl_settings['plugin_dir_path'] . 'includes/classes/MPSLShortcode.php';
+        $shortcode = new MPSLShortcode($sliderOptions, $edit_mode);
         include $mpsl_settings['plugin_dir_path'] . 'views/shortcode.php';
         $result = ob_get_clean();
         return $hasVisibleSlides ? $result : null;
@@ -1035,6 +1197,8 @@ function mpsl_enqueue_core_scripts_styles($edit_mode = false) {
 
 		wp_enqueue_style('mpsl-core', $mpsl_settings['plugin_dir_url'] . 'motoslider_core/styles/motoslider.css', array(), $mpsl_settings['core_version']);
 		wp_enqueue_style('mpsl-object-style', $mpsl_settings['plugin_dir_url'] . 'css/theme.css', array('mpsl-core'), $mpsl_settings['plugin_version']);
+		wp_enqueue_style('mpsl-object-gfonts', '//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800', array('mpsl-object-style'), $mpsl_settings['plugin_version']);
+
 		do_action('mpsl_slider_enqueue_style');
 
 		if (!$edit_mode) {

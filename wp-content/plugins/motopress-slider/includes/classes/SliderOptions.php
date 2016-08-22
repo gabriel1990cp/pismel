@@ -9,58 +9,81 @@ class MPSLSliderOptions extends MPSLMainOptions {
     private $slidePreview = false;
     private $previewSlideId = null;
     private $edit = false;
+    private $templateId = null;
+    private $sliderType = 'custom';
 //    private $previewOptions = null;
+
     /**
-     * @param null $id
-     * @param mixed bool|int $preview Slide ID for preview or FALSE for default functionality
+     * @param mixed (int|array) $id
+     * @param mixed (bool|int) $preview Slide ID for preview or FALSE for default functionality
      */
-    function __construct($id = null, $preview = false, $slidePreview = false, $edit = false) { //, $options = null
+    function __construct($id = null, $preview = false, $slidePreview = false, $edit = false) {
         parent::__construct();
 
         $this->preview = $preview;
         $this->edit = $edit;
         $this->slidePreview = $slidePreview;
 
+	    $options = $this->load($id);
 
         $this->options = include($this->getSettingsPath());
         $this->prepareOptions($this->options);
 
-//        $this->previewOptions = $options;
+	    $this->prepare($options);
+    }
 
-        if (is_null($id)) {
-            $this->overrideOptions(null, false);
-        } else {
-            $this->load($id);
+	/**
+     * @param mixed int|array $options
+	 * @return mixed array|bool
+     */
+    protected function load($options) {
+        $sliderType = isset($_REQUEST['slider_type']) ? $_REQUEST['slider_type'] : self::DEFAULT_SLIDER_TYPE;
+	    $_options = false;
+
+	    if (!is_null($options)) {
+		    if (is_int($options) || is_string($options)) {
+			    global $wpdb;
+			    $getBy = is_int($options) ? 'id' : 'alias';
+
+			    $sliderRow = $wpdb->get_row(sprintf(
+				    "SELECT * FROM %s WHERE {$getBy} = " . ($getBy === 'id' ? '%d' : '\'%s\''),
+				    $wpdb->prefix . ($this->preview && !$this->edit ? parent::SLIDERS_PREVIEW_TABLE : parent::SLIDERS_TABLE),
+				    $getBy === 'id' ? (int)$options : (string)$options
+			    ), ARRAY_A);
+
+			    if (!is_null($sliderRow)) {
+				    $this->setId((int) $sliderRow['id']);
+				    $_options = json_decode($sliderRow['options'], true);
+			    }
+
+		    } elseif (is_array($options)) {
+				$_options = $options['grouped'] ? $this->ungroupOptions($options['options']) : $options['options'];
+		    }
+
+		    $sliderType = isset($_options['slider_type']) ? $_options['slider_type'] : self::DEFAULT_SLIDER_TYPE;
+	    }
+
+	    $this->setSliderType($sliderType);
+
+	    return $_options;
+    }
+
+	protected function prepare($options) {
+		$this->overrideOptions($options, false);
+
+		if (!$options) return false;
+
+        if ($this->sliderType !== self::DEFAULT_SLIDER_TYPE) {
+            $db = MPSliderDB::getInstance();
+            $slides = $db->getSlidesBySlider($this->id);
+
+            if (count($slides)) {
+                $this->setTemplateId($slides[0]['id']);
+            }
         }
-//        var_dump($this->options['main']['options']['start_slide']);die;
-    }
+	}
 
-    public function setPreviewSlideId($id){
-        $this->previewSlideId = $id;
-    }
-
-    protected function load($id) {
-        global $wpdb;
-
-        $result = $wpdb->get_row(sprintf(
-            'SELECT * FROM %s WHERE id = %d',
-            $wpdb->prefix . ($this->preview  && !$this->edit ? parent::SLIDERS_PREVIEW_TABLE : parent::SLIDERS_TABLE),
-            (int) $id
-        ), ARRAY_A);
-        if (is_null($result)) return false;
-
-        $this->id = (int) $id;
-        $this->title = $result['title'];
-        $this->alias = $result['alias'];
-
-//        $options = is_null($this->previewOptions) ?  : json_decode($this->previewOptions, true);
-
-        $options = json_decode($result['options'], true);
-        $this->overrideOptions($options, false);
-
-        return true;
-    }
-
+	/*
     public function loadByAlias($alias) {
         global $wpdb;
 
@@ -82,12 +105,12 @@ class MPSLSliderOptions extends MPSLMainOptions {
 
         return true;
     }
+	*/
 
+    public function setOptions($options) {}
 
-    public function setOptions($options){
-
-
-//        var_dump($options); die;
+	public function setPreviewSlideId($id) {
+        $this->previewSlideId = $id;
     }
 
     public function update() {
@@ -117,6 +140,13 @@ class MPSLSliderOptions extends MPSLMainOptions {
         } else {
             return $wpdb->update($qTable, $qData, array('id' => $this->getId()), $qFormats);
         }
+    }
+
+    private function createTemplate() {
+        $slide = new MPSLSlideOptions();
+        $slide->create($this->id);
+        $this->setTemplateId($slide->getId());
+        return $slide->getId();
     }
 
     public function getTitle() {
@@ -197,8 +227,9 @@ class MPSLSliderOptions extends MPSLMainOptions {
         );
     }
 
-    public function overrideOptions($options = null, $isGrouped = true) {
+    public function overrideOptions($options = false, $isGrouped = true) {
         parent::overrideOptions($options, $isGrouped);
+
         if ($isGrouped) {
             if (isset($options['main']['title'])) {
                 $this->setTitle($options['main']['title']);
@@ -206,6 +237,7 @@ class MPSLSliderOptions extends MPSLMainOptions {
             if (isset($options['main']['alias'])) {
                 $this->setAlias($options['main']['alias']);
             }
+
         } else {
             if (isset($options['title'])) {
                 $this->setTitle($options['title']);
@@ -216,7 +248,8 @@ class MPSLSliderOptions extends MPSLMainOptions {
         }
     }
 
-    public function create() {
+
+    public function create($createTemplate = true) {
         global $wpdb;
 
         // TODO: Flash messages
@@ -234,14 +267,16 @@ class MPSLSliderOptions extends MPSLMainOptions {
             'options' => json_encode($this->getOptionValues())
         );
         $qFormats = array('%s', '%s', '%s');
-
-        // Exec query
-
         $result = $wpdb->insert($qTable, $qData, $qFormats);
+
         if (false !== $result) {
             $id = $wpdb->insert_id;
-            $this->setId($id);
+	        $this->setId($id);
+	        if ($createTemplate && $this->sliderType !== self::DEFAULT_SLIDER_TYPE) {
+		        $this->createTemplate();
+	        }
             return $id;
+
         } else {
             return false;
         }
@@ -293,7 +328,7 @@ class MPSLSliderOptions extends MPSLMainOptions {
 
     public function isNotValidOption($option){
         if (empty($option)) {
-            return __('Empty option ', MPSL_TEXTDOMAIN) . $option['label'];
+            return __('Empty option ', 'motopress-slider') . $option['label'];
         }
         return false;
     }
@@ -328,7 +363,7 @@ class MPSLSliderOptions extends MPSLMainOptions {
         $this->setAlias($uniqueAlias);
         $this->setTitle($newTitle);
         $oldId = $this->getId();
-        $newId = $this->create();
+        $newId = $this->create(false);
 
         if (false !== $newId) {
 			/*global $wpdb;
@@ -342,7 +377,7 @@ class MPSLSliderOptions extends MPSLMainOptions {
 
 	        global $wpdb;
 	        $wpdb->hide_errors();
-	        $slides = $this->getSlides($oldId); // TODO: Create and use another function (select only IDs)
+	        $slides = $this->getSlides($oldId); /** @todo: Create and use another function (select only IDs) */
 	        $slidesRes = true;
 
 	        foreach ($slides as $slide) {
@@ -384,9 +419,12 @@ class MPSLSliderOptions extends MPSLMainOptions {
 
     public function render(){
         global $mpsl_settings;
-        $slider = $this;
-        $slider->setUniqueAliasIfEmpty();
-        include($this->getViewPath());
+        if (!is_plugin_active('woocommerce/woocommerce.php') && $this->sliderType === 'woocommerce') {
+            include($this->pluginDir . 'views/woocommerce-not-found.php');
+        } else {
+            $this->setUniqueAliasIfEmpty();
+            include($this->getViewPath());
+        }
     }
 
     public function isAliasValid(){
@@ -445,5 +483,78 @@ class MPSLSliderOptions extends MPSLMainOptions {
 	protected function getViewFileName() {
 		return 'slider';
 	}
+
+
+    public function getTemplateId() {
+        return $this->templateId;
+    }
+
+    public function setTemplateId($id) {
+        $this->templateId = $id;
+    }
+
+
+    public function setSliderType($type) {
+        $this->sliderType = $type;
+    }
+
+    public function getSliderType() {
+        return $this->sliderType;
+    }
+
+    public function getTaxonomyName($postTypeName) {
+
+        $taxs = get_object_taxonomies($postTypeName, 'objects');
+
+        if(post_type_supports($postTypeName, 'post-formats') && $postTypeName !== 'post'){
+            $postFormat = get_object_taxonomies('post', 'objects');
+            $taxs['post_format'] = $postFormat['post_format'];
+        }
+
+        $result = array();
+        foreach ($taxs as $taxName => $tax) {
+            if (($tax->hierarchical) || (!$tax->hierarchical))
+                $result[$taxName] = $tax->label;
+        }
+        return $result;
+    }
+
+
+    public function getTaxTerms($taxs, $postTypeName, $type) {
+        $result = array();
+
+        foreach ($taxs as $tax_name => $tax_label) {
+            $args = array();
+            if ($type === 'format') $args['hide_empty'] = false;
+
+            $tax_terms = get_terms($tax_name, $args);
+            foreach ($tax_terms as $tax_term) {
+                if (is_object($tax_term)) {
+                    $tax_term = get_object_vars($tax_term);
+                }
+
+	            $arr = array();
+	            if ($type === 'categories') {
+		            $arr = array('category', 'product_cat');
+	            } elseif ($type === 'tags') {
+		            $arr = array('post_tag', 'product_tag');
+	            } elseif ($type === 'format') {
+		            $arr = array('post_format');
+	            }
+
+                if (in_array($tax_term['taxonomy'], $arr)) {
+                    $result[] = array(
+                        'key' => $tax_term['term_id'],
+                        'value' => $tax_term['name']
+                    );
+                }
+            }
+        }
+
+//        if (in_array($postTypeName, array('post', 'product'))) {
+            array_unshift($result, array('key' => 0, 'value' => 'All ' . $type));
+//        }
+        return $result;
+    }
 
 }

@@ -13,18 +13,18 @@ class MPSLPluginOptions {
             add_settings_error(
                 'motopressSliderOptions',
                 esc_attr('settings_updated'),
-                __('Slider Settings Updated', MPSL_TEXTDOMAIN),
+                __('Slider Settings Updated', 'motopress-slider'),
                 'updated'
             );
         }
 
         echo '<div class="wrap">';
-        echo '<h2>'.__('Slider Settings', MPSL_TEXTDOMAIN).'</h2>';
+        echo '<h2>'.__('Slider Settings', 'motopress-slider').'</h2>';
         settings_errors('motopressSliderOptions', false);
         echo '<form actoin="options.php" method="POST">';
         do_settings_sections('motopress-slider-options');
         wp_nonce_field( 'motopress-slider-options');
-        echo '<p class="submit"><input type="submit" name="submit" id="submit" class="button-primary" value="'.__('Save', MPSL_TEXTDOMAIN).'" /></p>';
+        echo '<p class="submit"><input type="submit" name="submit" id="submit" class="button-primary" value="'.__('Save', 'motopress-slider').'" /></p>';
         echo '</form>';
         echo '</div>';
     }
@@ -52,14 +52,14 @@ class MPSLPluginOptions {
             $optionName = 'MPSLRolesSettingsFields';
             register_setting($optionName, $optionName);
             add_settings_section($optionName, '', array($this, 'MPSLRolesSettingsSecTxt'), 'motopress-slider-options');
-            add_settings_field('motopressSliderRoles', __('Disable Slider for user groups:', MPSL_TEXTDOMAIN), array($this, 'MPSLRolesSettingsFields'), 'motopress-slider-options', 'MPSLRolesSettingsFields');
+            add_settings_field('motopressSliderRoles', __('Disable Slider for user groups:', 'motopress-slider'), array($this, 'MPSLRolesSettingsFields'), 'motopress-slider-options', 'MPSLRolesSettingsFields');
         }
     }
 
     public function addMenu(){
         global $mpsl_settings;
         $currentUser = wp_get_current_user();
-        $optionsHook = add_submenu_page($mpsl_settings['plugin_name'], __('Settings', MPSL_TEXTDOMAIN), __('Settings', MPSL_TEXTDOMAIN), 'manage_options', 'motopress-slider-options', array($this, 'renderPage'));
+        $optionsHook = add_submenu_page($mpsl_settings['plugin_name'], __('Settings', 'motopress-slider'), __('Settings', 'motopress-slider'), 'manage_options', 'motopress-slider-options', array($this, 'renderPage'));
         add_action('load-' . $optionsHook, array($this, 'save'));
         $this->registerSettings();
     }
@@ -83,7 +83,7 @@ class MPSLPluginOptions {
             echo '<label><input type="checkbox" name="disabled_roles[]" value="'.$role.'" '.$checked. ' /> '.$roleName.'</label><br/>';
         }
 
-        echo '<p class="description">' . __('Hide Slider menu for selected groups', MPSL_TEXTDOMAIN) . '</p>';
+        echo '<p class="description">' . __('Hide Slider menu for selected groups', 'motopress-slider') . '</p>';
     }
 
 }

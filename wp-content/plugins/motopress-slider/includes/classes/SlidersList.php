@@ -34,8 +34,9 @@ class MPSLSlidersList extends MPSLList{
             $this->mpsl_settings['sliders_table']
         ), ARRAY_A);
 
-        foreach($result as &$slider){
+        foreach ($result as &$slider) {
             $slider['options'] = json_decode($slider['options'], true);
+            $slider['options']['slider_type'] = isset($slider['options']['slider_type']) ? $slider['options']['slider_type'] : 'custom';
         }
         return $result;
     }
@@ -54,6 +55,9 @@ class MPSLSlidersList extends MPSLList{
             $id
         ), ARRAY_A);
 
+        $result['options'] = json_decode($result['options'], true);
+        $result['options']['slider_type'] = isset($result['options']['slider_type']) ? $result['options']['slider_type'] : 'custom';
+
         return $result;
     }
     public function getSliderCreateUrl(){
@@ -65,5 +69,11 @@ class MPSLSlidersList extends MPSLList{
         global $mpsl_settings;
         $menu_url = menu_page_url($mpsl_settings['plugin_name'], false);
         return add_query_arg(array('view' => 'export'), $menu_url);
+    }
+
+    public function getTemplateId($id) {
+        $db = MPSliderDB::getInstance();
+        $slides = $db->getSlidesBySlider($id);
+        return count($slides) ? $slides[0]['id'] : false;
     }
 }

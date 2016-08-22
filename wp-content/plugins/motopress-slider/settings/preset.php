@@ -10,7 +10,7 @@ if (!(defined('DOING_AJAX') and DOING_AJAX) and is_admin()) {
 		$googleFonts = file_get_contents($mpsl_settings['plugin_dir_path'] . 'vendor/googlefonts/webfonts.json');
 		$googleFonts = $googleFonts ? json_decode($googleFonts, true) : array();
 
-		$fonts[''] = '-- ' . __('SELECT', MPSL_TEXTDOMAIN) . ' --';
+		$fonts[''] = '-- ' . __('SELECT', 'motopress-slider') . ' --';
 
 		if (!is_null($googleFonts) && isset($googleFonts['items'])) {
 			foreach ($googleFonts['items'] as $gFont) {
@@ -35,20 +35,20 @@ if (!(defined('DOING_AJAX') and DOING_AJAX) and is_admin()) {
 
 return array(
     'font-typography' => array(
-        'title' => __('Font and typography', MPSL_TEXTDOMAIN),
+        'title' => __('Font and typography', 'motopress-slider'),
         'icon' => null,
         'description' => '',
         'col' => '12',
         'options' => array(
 	        'allow_style' => array(
 		        'type' => 'checkbox',
-		        'label2' => __('Enable mouse over styles', MPSL_TEXTDOMAIN),
+		        'label2' => __('Enable mouse over styles', 'motopress-slider'),
 		        'default' => true
 	        ),
 
             'background-color' => array(
                 'type' => 'color_picker',
-                'label' => __('Background color:', MPSL_TEXTDOMAIN),
+                'label' => __('Background color:', 'motopress-slider'),
                 'default' => '',
 	            'disabled_dependency' => array(
 	                'parameter' => 'allow_style',
@@ -57,7 +57,7 @@ return array(
             ),
             'color' => array(
                 'type' => 'color_picker',
-                'label' => __('Text color:', MPSL_TEXTDOMAIN),
+                'label' => __('Text color:', 'motopress-slider'),
                 'default' => '',
 	            'disabled_dependency' => array(
 	                'parameter' => 'allow_style',
@@ -66,7 +66,7 @@ return array(
             ),
             'font-size' => array(
                 'type' => 'number',
-                'label' => __('Font size:', MPSL_TEXTDOMAIN),
+                'label' => __('Font size:', 'motopress-slider'),
                 'default' => '',
 	            'min' => 0,
 				'unit' => 'px',
@@ -77,7 +77,7 @@ return array(
             ),
 			'font-family' => array(
                 'type' => 'font_picker',
-                'label' => __('Font:', MPSL_TEXTDOMAIN),
+                'label' => __('Font:', 'motopress-slider'),
                 'default' => '',
 				// regular -> normal | (?) skip italic & [number]italic | default - regular, :first or empty
 	            'list' => $fonts,
@@ -96,7 +96,7 @@ return array(
             ),
 			'font-weight' => array(
                 'type' => 'select',
-                'label' => __('Weight:', MPSL_TEXTDOMAIN),
+                'label' => __('Weight:', 'motopress-slider'),
                 'default' => '',
 				'helpers' => array('font-family'),
 				'dynamicList' => array(
@@ -122,7 +122,7 @@ return array(
             ),
 	        'font-style' => array(
 		        'type' => 'select',
-		        'label' => __('Font style:', MPSL_TEXTDOMAIN),
+		        'label' => __('Font style:', 'motopress-slider'),
 		        'default' => '',
 		        'list' => array(
 			        '' => 'Inherit',
@@ -135,17 +135,17 @@ return array(
 	        ),
 //	        'font-style' => array(
 //		        'type' => 'checkbox',
-//		        'label' => __('Italic:', MPSL_TEXTDOMAIN),
+//		        'label' => __('Italic:', 'motopress-slider'),
 //		        'default' => false
 //	        ),
 //			'white-space' => array(
 //                'type' => 'checkbox',
-//                'label' => __('Wordwrap:', MPSL_TEXTDOMAIN),
+//                'label' => __('Wordwrap:', 'motopress-slider'),
 //                'default' => false
 //            ),
             'letter-spacing' => array(
                 'type' => 'number',
-                'label' => __('Letter spacing:', MPSL_TEXTDOMAIN),
+                'label' => __('Letter spacing:', 'motopress-slider'),
                 'default' => '',
 				'unit' => 'px',
 	            'disabled_dependency' => array(
@@ -155,7 +155,7 @@ return array(
             ),
 	        'line-height' => array(
                 'type' => 'number',
-                'label' => __('Line height:', MPSL_TEXTDOMAIN),
+                'label' => __('Line height:', 'motopress-slider'),
                 'default' => '', // normal
 		        'min' => 0,
 				'unit' => 'px',
@@ -166,7 +166,7 @@ return array(
             ),
 	        'text-align' => array(
                 'type' => 'select',
-                'label' => __('Text align:', MPSL_TEXTDOMAIN),
+                'label' => __('Text align:', 'motopress-slider'),
                 'default' => '',
 		        'list' => array(
 			        '' => 'Inherit',
@@ -183,7 +183,7 @@ return array(
         )
     ),
     'text-shadow' => array(
-        'title' => __('Text Shadow', MPSL_TEXTDOMAIN),
+        'title' => __('Text Shadow', 'motopress-slider'),
         'icon' => null,
         'description' => '',
         'col' => '12',
@@ -194,24 +194,24 @@ return array(
 				'options' => array(
 					'text_shadow_color' => array(
 						'type' => 'color_picker',
-						'label' => __('Color:', MPSL_TEXTDOMAIN),
+						'label' => __('Color:', 'motopress-slider'),
 						'default' => ''
 					),
 					'text_shadow_hor_len' => array(
 						'type' => 'number',
-						'label' => __('Horizontal Length:', MPSL_TEXTDOMAIN),
+						'label' => __('Horizontal Length:', 'motopress-slider'),
 						'default' => '',
 						'unit' => 'px'
 					),
 					'text_shadow_vert_len' => array(
 						'type' => 'number',
-						'label' => __('Vertical Length:', MPSL_TEXTDOMAIN),
+						'label' => __('Vertical Length:', 'motopress-slider'),
 						'default' => '',
 						'unit' => 'px'
 					),
 					'text_shadow_radius' => array(
 						'type' => 'number',
-						'label' => __('Radius:', MPSL_TEXTDOMAIN),
+						'label' => __('Radius:', 'motopress-slider'),
 						'default' => '',
 						'min' => 0,
 						'unit' => 'px'
@@ -225,14 +225,14 @@ return array(
         )
     ),
     'border' => array(
-        'title' => __('Border', MPSL_TEXTDOMAIN),
+        'title' => __('Border', 'motopress-slider'),
         'icon' => null,
         'description' => '',
         'col' => '12',
         'options' => array(
             'border-style' => array(
                 'type' => 'select',
-                'label' => __('Border Style:', MPSL_TEXTDOMAIN),
+                'label' => __('Border Style:', 'motopress-slider'),
                 'default' => '',
 	            'list' => array(
 		            'none' => 'None',
@@ -254,7 +254,7 @@ return array(
             ),
             /*'border-width' => array(
                 'type' => 'number',
-                'label' => __('Border Width:', MPSL_TEXTDOMAIN),
+                'label' => __('Border Width:', 'motopress-slider'),
                 'default' => '',
 	            'min' => 0,
 				'unit' => 'px'
@@ -265,7 +265,7 @@ return array(
             ),*/
 	        'border-top-width' => array(
                 'type' => 'number',
-                'label' => __('Top:', MPSL_TEXTDOMAIN),
+                'label' => __('Top:', 'motopress-slider'),
                 'default' => '',
 	            'min' => 0,
 				'unit' => 'px',
@@ -276,7 +276,7 @@ return array(
             ),
             'border-right-width' => array(
                 'type' => 'number',
-                'label' => __('Right:', MPSL_TEXTDOMAIN),
+                'label' => __('Right:', 'motopress-slider'),
                 'default' => '',
 	            'min' => 0,
 				'unit' => 'px',
@@ -287,7 +287,7 @@ return array(
             ),
             'border-bottom-width' => array(
                 'type' => 'number',
-                'label' => __('Bottom:', MPSL_TEXTDOMAIN),
+                'label' => __('Bottom:', 'motopress-slider'),
                 'default' => '',
 	            'min' => 0,
 				'unit' => 'px',
@@ -298,7 +298,7 @@ return array(
             ),
             'border-left-width' => array(
                 'type' => 'number',
-                'label' => __('Left:', MPSL_TEXTDOMAIN),
+                'label' => __('Left:', 'motopress-slider'),
                 'default' => '',
 	            'min' => 0,
 				'unit' => 'px',
@@ -309,7 +309,7 @@ return array(
             ),
             'border-color' => array(
                 'type' => 'color_picker',
-                'label' => __('Border Color:', MPSL_TEXTDOMAIN),
+                'label' => __('Border Color:', 'motopress-slider'),
                 'default' => '',
 		        'disabled_dependency' => array(
 	                'parameter' => 'allow_style',
@@ -318,7 +318,7 @@ return array(
             ),
             'border-radius' => array(
                 'type' => 'number',
-                'label' => __('Border Radius:', MPSL_TEXTDOMAIN),
+                'label' => __('Border Radius:', 'motopress-slider'),
                 'default' => '',
 	            'min' => 0,
 				'unit' => 'px',
@@ -330,14 +330,14 @@ return array(
         )
     ),
     'padding' => array(
-        'title' => __('Padding', MPSL_TEXTDOMAIN),
+        'title' => __('Padding', 'motopress-slider'),
         'icon' => null,
         'description' => '',
         'col' => '12',
         'options' => array(
             'padding-top' => array(
                 'type' => 'number',
-                'label' => __('Top:', MPSL_TEXTDOMAIN),
+                'label' => __('Top:', 'motopress-slider'),
                 'default' => '',
 	            'min' => 0,
 				'unit' => 'px',
@@ -348,7 +348,7 @@ return array(
             ),
             'padding-right' => array(
                 'type' => 'number',
-                'label' => __('Right:', MPSL_TEXTDOMAIN),
+                'label' => __('Right:', 'motopress-slider'),
                 'default' => '',
 	            'min' => 0,
 				'unit' => 'px',
@@ -359,7 +359,7 @@ return array(
             ),
             'padding-bottom' => array(
                 'type' => 'number',
-                'label' => __('Bottom:', MPSL_TEXTDOMAIN),
+                'label' => __('Bottom:', 'motopress-slider'),
                 'default' => '',
 	            'min' => 0,
 				'unit' => 'px',
@@ -370,7 +370,7 @@ return array(
             ),
             'padding-left' => array(
                 'type' => 'number',
-                'label' => __('Left:', MPSL_TEXTDOMAIN),
+                'label' => __('Left:', 'motopress-slider'),
                 'default' => '',
 	            'min' => 0,
 				'unit' => 'px',
@@ -382,7 +382,7 @@ return array(
         )
     ),
     'advanced-editor' => array(
-        'title' => __('Advanced Editor', MPSL_TEXTDOMAIN),
+        'title' => __('Advanced Editor', 'motopress-slider'),
         'icon' => null,
         'description' => '',
         'col' => '12',
@@ -390,7 +390,7 @@ return array(
 			'custom_styles' => array(
                 'type' => 'codemirror',
                 'mode' => 'css',
-                'label2' => __('Custom styles', MPSL_TEXTDOMAIN),
+                'label2' => __('Custom styles', 'motopress-slider'),
                 'default' => '',
 		        'disabled_dependency' => array(
 	                'parameter' => 'allow_style',

@@ -22,7 +22,7 @@ class MPSLSlidesList extends MPSLList {
 
         } else {
             // TODO: Throw error
-            _e('Record not found', MPSL_TEXTDOMAIN);
+            _e('Record not found', 'motopress-slider');
         }
     }
 

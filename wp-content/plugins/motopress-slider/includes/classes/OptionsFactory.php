@@ -4,12 +4,14 @@ if (!defined('ABSPATH')) exit;
 class MPSLOptionsFactory {
     static $inited = false;
     static $prefix;
+    static $altPrefix;
 
     public function  __construct() {
         self::$inited = true;
 
         global $mpsl_settings;
         self::$prefix = $mpsl_settings['prefix'];
+        self::$altPrefix = $mpsl_settings['alt_prefix'];
     }
 
     static function createControl(&$option, $parent = '', $type = 'default') {
@@ -45,6 +47,9 @@ class MPSLOptionsFactory {
 	        case 'font_picker' : self::addLabel2($option); self::addSelect($option); break;
 	        case 'color_picker' : self::addLabel2($option); self::addColorPicker($option); break;
 	        case 'text_shadow' : self::addLabel2($option); self::addTextShadow($option); break;
+            case 'tiny_mce' : self::addLabel2($option); self::addTinyMCE($option); break;
+            case 'animation_control': self::addAnimationControl($option); break;
+            case 'pretty_select': self::addPrettySelectControl($option); break;
         }
             self::addDescription($option);
         ?>
@@ -56,7 +61,7 @@ class MPSLOptionsFactory {
     static function addControl(&$option, $parent = '') {
         MPSLOptionsFactory::createControl($option, $parent);
     }
-    
+
     static function addStyleControl(&$option, $parent = '') {
         MPSLOptionsFactory::createControl($option, $parent, 'style');
     }
@@ -117,12 +122,32 @@ class MPSLOptionsFactory {
         $rows = (isset($option['rows']) && is_numeric($option['rows']) && $option['rows']) ? ' rows="' . $option['rows'] . '"' : '';
         $cols = (isset($option['cols']) && is_numeric($option['cols']) && $option['cols']) ? ' cols="' . $option['cols'] . '"' : '';
         $areaSize = isset($option['area_size']) && $option['area_size'] ? $option['area_size'] . '-text' : '';
-    ?>
+        ?>
         <textarea id="<?php echo self::$prefix.$option['name']; ?>" name="<?php echo self::$prefix . $option['name'] ?>" <?php echo $rows . $cols . $disabled . $required . $readonly; ?> class="<?php echo $areaSize; ?>"><?php echo $option['value']; ?></textarea>
-    <?php
+        <?php
     }
-    
-    static function addCodeMirror(&$option){        
+
+
+    static function addTinyMCE(&$option) {
+        $settings = array(
+            'media_buttons' => 1,
+            'textarea_name' => self::$altPrefix . $option['name'],
+            'textarea_rows' => 10,
+            'tabindex' => null,
+            'editor_css' => '<style type="text/css">p { margin:0; padding:0 }</style>',
+            'editor_class' => '',
+            'teeny' => 0,
+            'dfw' => 0,
+            'tinymce' => 1,
+            'quicktags' => 1,
+            'drag_drop_upload' => false,
+        );
+
+//        echo '<input type="hidden" name="mpsl_tinymce_mode" value="' . wp_default_editor() . '">';
+        wp_editor($option['value'], self::$altPrefix . $option['name'], $settings);
+    }
+
+    static function addCodeMirror(&$option){
         $disabled = isset($option['disabled']) && $option['disabled'] ? ' disabled="disabled"' : '';
         $required = isset($option['required']) && $option['required'] ? ' required="required"' : '';
         $readonly = isset($option['readonly']) && $option['readonly'] ? ' readonly="readonly"' : '';
@@ -135,36 +160,55 @@ class MPSLOptionsFactory {
         $disabled = isset($option['disabled']) && $option['disabled'] ? ' disabled="disabled"' : '';
         $required = isset($option['required']) && $option['required'] ? ' required="required"' : '';
         $readonly = isset($option['readonly']) && $option['readonly'] ? ' readonly="readonly"' : '';
+        $multiple = isset($option['multiple']) && $option['multiple'] ? ' multiple' : '';
+
+        if (!is_array($option['value'])) {
+            if(isset($option['value'])){
+                $option['value'] =  array($option['value']);
+            }else{
+                $option['value'] = array();
+            }
+        }
+
+        if(!count($option['value'])){
+            $option['value'][] = 0;
+        }else if(count($option['value']) > 1 && ($key = array_search(0, $option['value'])) !== false){
+            unset($option['value'][$key]);
+        }
+
     ?>
-        <select id="<?php echo self::$prefix.$option['name']; ?>" name="<?php echo self::$prefix . $option['name']; ?>"<?php echo $disabled . $required . $readonly; ?>>
-            <?php if (isset( $option['list'] )) {
-	            $attrSettings = isset($option['listAttrSettings']) ? $option['listAttrSettings'] : array();
-                foreach($option['list'] as $key => $value) {
-                    $selected = isset($option['value']) && $option['value'] === $key ? ' selected="selected"' : '';
-	                if (is_array($value)) {
-		                $attrs = '';
-		                if (isset($value['attrs']) && is_array($value['attrs'])) {
-							foreach ($value['attrs'] as $attrName => $attrVal) {
-								$attrStr = '';
-								switch ($attrSettings[$attrName]['type']) {
-									case 'split':
-										$attrStr .= implode($attrSettings[$attrName]['delimiter'], $attrVal);
-										break;
-									case 'json':
-										$attrStr .= htmlspecialchars(json_encode($attrVal), ENT_QUOTES, 'UTF-8');
-										break;
-								}
-								$attrs .= "$attrName='$attrStr' ";
-							}
-		                }
-	                ?>
-						<option value="<?php echo $key; ?>" <?php echo $attrs . ' ' . $selected; ?>><?php echo $value['label']; ?></option>
-	                <?php } else { ?>
-		                <option value="<?php echo $key; ?>" <?php echo $selected; ?>><?php echo $value; ?></option>
-	               <?php }
-                }
-            }?>
-        </select>
+    <select id="<?php echo self::$prefix.$option['name']; ?>" name="<?php echo self::$prefix . $option['name']; ?>"<?php echo $disabled . $required . $readonly . $multiple; ?>>
+        <?php if (isset( $option['list'] )) {
+            $attrSettings = isset($option['listAttrSettings']) ? $option['listAttrSettings'] : array();
+            foreach($option['list'] as $key => $value) {
+
+//                $selected = isset($optValue) && $optValue === $key ? ' selected="selected"' : '';
+                $selected = in_array($key, $option['value']) ? ' selected="selected"' : '';
+                if (is_array($value)) {
+                    $attrs = '';
+                    if (isset($value['attrs']) && is_array($value['attrs'])) {
+                        foreach ($value['attrs'] as $attrName => $attrVal) {
+                            $attrStr = '';
+                            switch ($attrSettings[$attrName]['type']) {
+                                case 'split':
+                                    $attrStr .= implode($attrSettings[$attrName]['delimiter'], $attrVal);
+                                    break;
+                                case 'json':
+                                    $attrStr .= htmlspecialchars(json_encode($attrVal), ENT_QUOTES, 'UTF-8');
+                                    break;
+                            }
+                            $attrs .= "$attrName='$attrStr' ";
+                        }
+                    }
+                    ?>
+                    <option value="<?php echo $key; ?>" <?php echo $attrs . ' ' . $selected; ?>><?php echo $value['label']; ?></option>
+                <?php } else { ?>
+                    <option value="<?php echo $key; ?>" <?php echo $selected; ?>><?php echo $value; ?></option>
+                <?php }
+
+            }
+        }?>
+    </select>
     <?php
     }
 
@@ -177,7 +221,7 @@ class MPSLOptionsFactory {
             foreach ($option['list'] as $key => $opt) {
                 $checked = (isset($option['value']) && in_array($key, $option['value'])) ? ' checked="checked"' : '';
         ?>
-                <input type="checkbox" id="<?php echo self::$prefix.$option['name'] . $key; ?>" name="<?php echo self::$prefix . $option['name']; ?>" value="<?php echo $key;?>"<?php echo $checked . $disabled . $required . $readonly; ?> />
+                <input type="checkbox" id="<?php echo self::$prefix.$option['name'] . $key; ?>" name="<?php echo self::$prefix . $option['name']; ?>[]" value="<?php echo $key;?>"<?php echo $checked . $disabled . $required . $readonly; ?> />
                 <label for="<?php echo self::$prefix.$option['name'] . $key; ?>"><?php echo $opt; ?></label>
         <?php
             }
@@ -241,7 +285,7 @@ class MPSLOptionsFactory {
         $can_remove = isset($option['can_remove']) && $option['can_remove'] ? true : false;
         $disabled = isset($option['disabled']) && $option['disabled'] ? ' disabled="disabled"' : '';
         $required = isset($option['required']) && $option['required'] ? ' required="required"' : '';
-        $buttonLabel = isset($option['button_label']) ? $option['button_label'] : __('Select Image', MPSL_TEXTDOMAIN);
+        $buttonLabel = isset($option['button_label']) ? $option['button_label'] : __('Select Image', 'motopress-slider');
         $id = (int) trim($option['value']);
         ?>
         <input type="hidden" value="<?php echo $id; ?>" id="<?php echo self::$prefix.$option['name']; ?>" name="<?php echo self::$prefix . $option['name']; ?>" <?php echo $disabled . $required; ?>>
@@ -249,7 +293,7 @@ class MPSLOptionsFactory {
         <?php
         if ($can_remove) {
         ?>
-          <a href="#" class="mpsl-option-library-image-remove"><?php _e('remove', MPSL_TEXTDOMAIN); ?></a>
+          <a href="#" class="mpsl-option-library-image-remove"><?php _e('remove', 'motopress-slider'); ?></a>
         <?php
         }
     }
@@ -257,7 +301,7 @@ class MPSLOptionsFactory {
     static function addLibraryVideo(&$option){
         $disabled = isset($option['disabled']) && $option['disabled'] ? ' disabled="disabled"' : '';
         $required = isset($option['required']) && $option['required'] ? ' required="required"' : '';
-        $buttonLabel = isset($option['button_label']) ? $option['button_label'] : __('Select Image', MPSL_TEXTDOMAIN);
+        $buttonLabel = isset($option['button_label']) ? $option['button_label'] : __('Select Image', 'motopress-slider');
         $id = (int) trim($option['value']);
         ?>
         <input type="hidden" value="<?php echo $id; ?>" id="<?php echo self::$prefix.$option['name']; ?>" name="<?php echo self::$prefix . $option['name']; ?>" <?php echo $disabled . $required; ?>>
@@ -269,7 +313,7 @@ class MPSLOptionsFactory {
         $disabled = isset($option['disabled']) && $option['disabled'] ? ' disabled="disabled"' : '';
         $required = isset($option['required']) && $option['required'] ? ' required="required"' : '';
         $readonly = isset($option['readonly']) && $option['readonly'] ? ' readonly="readonly"' : '';
-        $buttonLabel = isset($option['button_label']) ? $option['button_label'] : __('Load', MPSL_TEXTDOMAIN);
+        $buttonLabel = isset($option['button_label']) ? $option['button_label'] : __('Load', 'motopress-slider');
         ?>
         <input type="text" value="<?php echo $option['value']; ?>" id="<?php echo self::$prefix.$option['name']; ?>" name="<?php echo self::$prefix . $option['name']; ?>" <?php echo $disabled . $required; ?>>
         <button class="mpsl-option-image-load-btn button-secondary"><?php echo $buttonLabel;?></button>
@@ -319,11 +363,12 @@ class MPSLOptionsFactory {
         $disabled = isset($option['disabled']) && $option['disabled'] ? ' disabled="disabled"' : '';
         $required = isset($option['required']) && $option['required'] ? ' required="required"' : '';
         $readonly = isset($option['readonly']) && $option['readonly'] ? ' readonly="readonly"' : '';
+        $classes = isset($option['classes']) && $option['classes'] ? $option['classes'] : '';
         $count = 0;
 
         echo '<div class="actions">';
         foreach ($option['list'] as $key => $opt) { ?>
-            <a href="javascript:void(0)" value="<?php echo $key;?>" <?php echo $disabled . $required . $readonly; ?> ><?php echo $opt; ?></a>
+            <a href="javascript:void(0)" class="<?php echo $classes; ?>" value="<?php echo $key;?>" <?php echo $disabled . $required . $readonly; ?> ><?php echo $opt; ?></a>
         <?php
             $count++;
             if ($count < count($option['list'])) echo ' | ';
@@ -331,10 +376,12 @@ class MPSLOptionsFactory {
         echo '</div>';
     }
 
+
+
     static function addSeparator(){
         echo '<hr/>';
     }
-    
+
     static function addStyleEditor(&$option) {
 	    $_disabled = isset($option['disabled']) && $option['disabled'];
 	    $disabledAttr = ' disabled="disabled"';
@@ -348,12 +395,60 @@ class MPSLOptionsFactory {
 	    $removeBtnDisabled = $_disabled ? $disabledAttr : '';
         ?>
 	    <select class="mpsl-layer-style-list" <?php echo $listDisabled . $required . $readonly; ?>>
-			<optgroup label="<?php _e('Custom', MPSL_TEXTDOMAIN); ?>" class="mpsl-layer-style-list-group-custom"></optgroup>
-			<optgroup label="<?php _e('Default', MPSL_TEXTDOMAIN); ?>" class="mpsl-layer-style-list-group-default"></optgroup>
+			<optgroup label="<?php _e('Custom', 'motopress-slider'); ?>" class="mpsl-layer-style-list-group-custom"></optgroup>
+			<optgroup label="<?php _e('Default', 'motopress-slider'); ?>" class="mpsl-layer-style-list-group-default"></optgroup>
 	    </select>
-        <button class="button button-primary mpsl-edit-layer-style" <?php echo $editBtnDisabled . $required . $readonly; ?>><?php echo $option['edit_label'] ?></button>
-        <button class="button mpsl-remove-layer-style" <?php echo $removeBtnDisabled . $required . $readonly; ?>><?php echo $option['remove_label'] ?></button>
+        <button class="button mpsl-edit-layer-style dashicons-before dashicons-admin-appearance" <?php echo $editBtnDisabled . $required . $readonly; ?>><?php echo $option['edit_label'] ?></button>
+        <a class="button-link mpsl-remove-layer-style" <?php echo $removeBtnDisabled . $required . $readonly; ?>><?php echo $option['remove_label'] ?></a>
 	    <input type="hidden" class="mpsl-layer-style-value " id="<?php echo self::$prefix.$option['name'] ?>" name="<?php echo self::$prefix . $option['name']; ?>" value="<?php echo $option['value']; ?>" disabled="disabled" />
+        <?php
+    }
+
+    static function addAnimationControl(&$option) {
+        $type = $option['animation_type'];
+        ?>
+        <button
+            class="button button-secondary mpsl-edit-animation-btn"><?php echo isset($option['text']) ? $option['text'] : ''; ?></button>
+
+        <div id="mpsl-animation-<?php echo $option['name']; ?>" class="mpsl-animation-editor-wrapper">
+            <div class="animation-left-wrapper">
+                <div class="animation-left-content">
+                    <div class="mpsl-animation-scene-wrapper ms_current_slide">
+                        <div class="mpsl-animation-preview-wrapper">
+                            <h1>Lorem ipsum</h1>
+                        </div>
+                        <button class="button button-secondary dashicons-before dashicons-controls-play mpsl-play-animation" >Play</button>
+                    </div>
+                    <div class="timing-duration-wrapper">
+                        <div class="mpsl-controls">
+                            <?php
+                            self::addControl($option['options'][$type . '_duration_clone'], $option['name']);
+                            self::addControl($option['options'][$type . '_timing_function_clone'], $option['name']);
+                            ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php self::addControl($option['options'][$type . '_animation_clone'], $option['name']); ?>
+            <div class="animation-footer-wrapper">
+                <button class="button button-primary mpsl-animation-apply">Apply</button>
+                <button class="button button-secondary mpsl-animation-close">Close</button>
+            </div>
+        </div>
+        <?php
+    }
+
+    static function addPrettySelectControl(&$option) {
+        ?>
+        <div class="mpsl-pretty-select-wrapper">
+            <div class="mpsl-select-list">
+                <ul>
+                <?php foreach ($option['list'] as $key => $value) { ?>
+                    <li data-value="<?php echo $key; ?>"><?php echo $value; ?></li>
+                <?php } ?>
+                </ul>
+            </div>
+        </div>
         <?php
     }
 

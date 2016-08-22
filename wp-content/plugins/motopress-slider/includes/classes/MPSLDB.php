@@ -229,4 +229,309 @@ class MPSliderDB {
         return $wpdb->query($query);
     }
 
+
+    public function getPostsByOptions($options, $sliderType) {
+	    $postType = $sliderType === 'post' ? $options['post_type'] : 'product';
+
+        $args = array(
+            'post_type' => $postType,
+	        'orderby' => 'menu_order date',
+			'order' => 'DESC',
+            'post_status' => 'publish',
+	        'ignore_sticky_posts' => 1,
+            'posts_per_page' => -1,
+            'offset' => 0,
+        );
+
+        if ($options['post_offset']) {
+            $args['offset'] = $options['post_offset'];
+        }
+
+        if ($options['post_order_by']) {
+            $args['orderby'] = $options['post_order_by'];
+        }
+
+        if ($options['post_count']) {
+            $args['posts_per_page'] = $options['post_count'];
+        }
+
+        if ($options['post_order_direction']) {
+            $args['order'] = $options['post_order_direction'];
+        }
+
+        if ($options['post_include_ids']) {
+            $args['include'] = $options['post_include_ids'];
+        }
+
+        if ($options['post_exclude_ids']) {
+            $args['exclude'] = $options['post_exclude_ids'];
+        }
+
+        $args['tax_query'] = array();
+        if(isset($options['post_categories'])) {
+            $taxQuery = $this->getTaxQuery($options['post_categories'], 'category', $postType, $sliderType);
+            if ($taxQuery) {
+                $args['tax_query'] = array_merge($args['tax_query'], $taxQuery);
+            }
+        }
+
+        if(isset($options['post_tags'])) {
+            $taxQuery = $this->getTaxQuery($options['post_tags'], 'tag', $postType, $sliderType);
+            if($taxQuery) {
+                $args['tax_query'] = array_merge($args['tax_query'], $taxQuery);
+            }
+        }
+
+        if (isset($options['post_format'])) {
+            $taxQuery = $this->getTaxQuery($options['post_format'], 'post_format', $postType, $sliderType);
+            if ($taxQuery) {
+                $args['tax_query'] = array_merge($args['tax_query'], $taxQuery);
+            }
+        }
+
+        if ($sliderType === 'woocommerce') {
+            $meta_query = array();
+            if ($options['wc_only_instock']) {
+                $meta_query[] = array(
+                    'key'       => '_stock_status',
+                    'value'     => 'outofstock',
+                    'compare'   => 'NOT IN'
+                );
+            }
+
+            if ($options['wc_only_featured']) {
+                $meta_query[] = array(
+                    'key' => '_featured',
+                    'value' => 'yes'
+                );
+            }
+
+            if ($options['wc_only_onsale']) {
+                $meta_query[] = array(
+                    'key' => '_sale_price',
+                    'value' => 0,
+                    'compare' => '>',
+                    'type' => 'NUMERIC'
+                );
+            }
+            $args['meta_query'] = $meta_query;
+
+        }
+
+        return new WP_Query($args);
+    }
+
+
+    private function getTaxQuery($termsArr, $type, $postType, $sliderType) {
+        $taxQuery = array();
+        if ($termsArr) {
+            if ($type === 'category') {
+                if ($sliderType === 'post') {
+                    if ($postType === 'product' ) {
+                        $taxonomy = 'product_cat';
+                    } else {
+                        $taxonomy = 'category';
+                    }
+                } else {
+                    $taxonomy = 'product_cat';
+                }
+
+            } else if ($type === 'tag') {
+                if ($sliderType === 'post') {
+                    if ($postType === 'product' ) {
+                        $taxonomy = 'product_tag';
+                    } else {
+                        $taxonomy = 'post_tag';
+                    }
+                } else {
+                    $taxonomy = 'product_tag';
+                }
+
+            } else {
+                $taxonomy = 'post_format';
+            }
+
+            if (count($termsArr) > 1 && ($key = array_search(0, $termsArr)) !== false) {
+                unset($termsArr[$key]);
+            }
+
+            if (!in_array(0, $termsArr)) {
+                $taxQuery[] = array(
+                    'taxonomy' => $taxonomy,
+                    'field' => 'id',
+                    'terms' => array_values($termsArr),
+                    'operator' => 'IN'
+                );
+            }
+        }
+
+        return $taxQuery;
+    }
+
+//    private function getTxQuery($categoriesArr, $tagsArr, $postFormatArr) {
+//        $taxQuery = array();
+////        if (($categoriesArr && $tagsArr) && (!in_array(0, $categoriesArr) || !in_array(0, $tagsArr))) {
+////            $taxQuery['relation'] = 'AND';
+////        }
+//        if (count($categoriesArr)) {
+//            if (count($categoriesArr) > 1 && ($key = array_search(0, $categoriesArr)) !== false) {
+//                unset($categoriesArr[$key]);
+//            }
+//
+//            if (!in_array(0, $categoriesArr)) {
+//                //TODO:: need postformat inject
+//
+//                $taxQuery[] = array(
+//                    'taxonomy' => $type === 'post' ? 'category' : 'product_cat',
+//                    'field' => 'id',
+//                    'terms' => $categoriesArr,
+//                    'operator' => 'IN'
+//                );
+//            }
+//        }
+//
+//        if (count($tagsArr)) {
+//            if (count($tagsArr) > 1 && ($key = array_search(0, $tagsArr)) !== false) {
+//                unset($tagsArr[$key]);
+//            }
+//            if (!in_array(0, $tagsArr)) {
+//                $taxQuery[] = array(
+//                    'taxonomy' => $type === 'post' ? 'post_tag' : 'product_tag',
+//                    'field' => 'id',
+//                    'terms' => $tagsArr,
+//                    'operator' => 'IN'
+//                );
+//            }
+//        }
+//
+//        if(count($postFormatArr)){
+//
+//            if (count($postFormatArr) > 1 && ($key = array_search(0, $postFormatArr)) !== false) {
+//                unset($postFormatArr[$key]);
+//            }
+//
+//            if (!in_array(0, $postFormatArr)) {
+//
+//                $taxQuery[] = array(
+//                    'taxonomy' => 'post_format',
+//                    'field' => 'id',
+//                    'terms' => $postFormatArr,
+//                    'operator' => 'IN'
+//                );
+//            }
+//
+//        }
+//
+//        if (count($taxQuery)) {
+//            $taxQuery['relation'] = 'AND';
+//        }
+//
+//        return $taxQuery;
+//    }
+
+
+    public function getImagebyPost($post, $isSrc = false, $imageFrom = 'auto') {
+        $imgSrc = '';
+        if ($imageFrom === 'auto') {
+            $imgSrc = has_post_thumbnail($post->ID) ? $this->getPostThumbnailFullSrc($post->ID) : '';
+            if (empty($imgSrc)) {
+//                $content = $post->post_content;
+	            $content = apply_filters('the_content', get_post_field('post_content', $post));
+                $imgSrc = $this->getFirstImageSrcFromString($content);
+            }
+
+        } elseif ($imageFrom === 'featured') {
+            $imgSrc = has_post_thumbnail($post->ID) ? $this->getPostThumbnailFullSrc($post->ID) : '';
+
+        } elseif ($imageFrom === 'first') {
+//            $content = $post->post_content;
+	        $content = apply_filters('the_content', get_post_field('post_content', $post));
+            $imgSrc = $this->getFirstImageSrcFromString($content);
+        }
+
+	    if ($isSrc) {
+		    return $imgSrc;
+	    } else {
+		    if (!empty($imgSrc)) {
+                return sprintf('<img src="%s" alt="%s" />', $imgSrc, strip_tags(get_the_title($post)));
+//               $post_thumbnail_id = get_post_thumbnail_id($post->ID);
+//               return  wp_get_attachment_image($post_thumbnail_id , 'medium', false, array(
+//                   'title' =>  esc_attr( $post_thumbnail_id ),
+//               ));
+
+		    } else {
+			    return '';
+		    }
+	    }
+    }
+
+    private function getPostThumbnailFullSrc($post_id) {
+        $post_id = is_null($post_id) ? get_the_ID() : $post_id;
+        $post_thumbnail_id = get_post_thumbnail_id($post_id);
+
+//        return wp_get_attachment_url($post_thumbnail_id, 'full');
+        return wp_get_attachment_url($post_thumbnail_id);
+    }
+
+    private function getFirstImageSrcFromString($content) {
+        $images = $this->extractStringTemplates($content);
+        return ($images && count($images[1])) ? $images[1][0] : '';
+    }
+
+    public function getPostImageThumbnail($post) {
+        $post_id = is_null($post->ID) ? get_the_ID() : $post->ID;
+        $result = wp_get_attachment_image_src( get_post_thumbnail_id($post_id), 'thumbnail' );
+        return $result[0];
+    }
+
+    private function extractStringTemplates($content) {
+        preg_match_all('|<img.*?src=[\'"](.*?)[\'"].*?>|i', $content, $matches);
+        return isset($matches) && count($matches[0]) ? $matches : false;
+    }
+
+    public function getFormatDate($key, $post) {
+        return mysql2date($key, $post->post_date);
+    }
+
+    public function getExcerpt($post, $charLen) {
+	    if (post_password_required($post)) {
+		    return get_the_password_form($post);
+	    }
+
+	    $excerpt = has_excerpt() ? $post->post_excerpt : $post->post_content;
+	    $excerpt = apply_filters('the_content', $excerpt);
+	    /*$excerpt = get_the_excerpt();
+	    $excerpt = do_shortcode($excerpt);*/
+
+        $excerpt = $this->stripShortcodes($excerpt);
+	    $excerpt = preg_replace('/<script.*?>.*?<\/script>/is', '', $excerpt);
+	    $excerpt = preg_replace('/<style.*?>.*?<\/style>/is', '', $excerpt);
+	    $excerpt = trim(strip_tags($excerpt));
+	    $oldStrLen = strlen($excerpt);
+        $excerpt = $this->getTrimmedString($excerpt, $charLen);
+	    $newStrLen = strlen($excerpt);
+
+	    if ($excerpt && $newStrLen !== $oldStrLen) {
+		    $excerpt .= ' ...';
+	    }
+
+        return $excerpt;
+    }
+
+    private function getTrimmedString($string, $maxLen = 10000) {
+        $maxLen = $maxLen > 0 ? $maxLen : 10000;
+        return function_exists('mb_strimwidth') ? mb_strimwidth($string, 0, $maxLen) : substr($string, 0, $maxLen);
+    }
+
+    private function stripShortcodes($content, $excludeStripShortcodeTags = null) {
+        if (!$content) return $content;
+
+        if (empty($excludeStripShortcodeTags) || !is_array($excludeStripShortcodeTags)) {
+            return preg_replace('/\[[^\]]*\]/', '', $content);
+        }
+
+        $excludeCodes = join('|', $excludeStripShortcodeTags);
+        return preg_replace("~(?:\[/?)(?!(?:$excludeCodes))[^/\]]+/?\]~s", '', $content);
+    }
+
 }

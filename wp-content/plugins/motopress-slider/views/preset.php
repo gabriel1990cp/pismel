@@ -25,10 +25,10 @@ $presetsTableDisabled = '';
 
 					            <div id="mpsl-style-mode-switcher">
 						            <input type="radio" id="mpsl_style_mode_switcher_style" name="mpsl_style_mode_switcher" data-mode="style" />
-						            <label for="mpsl_style_mode_switcher_style"><?php _e('Normal state', MPSL_TEXTDOMAIN) ?></label>
+						            <label for="mpsl_style_mode_switcher_style"><?php _e('Normal state', 'motopress-slider') ?></label>
 
 						            <input type="radio" id="mpsl_style_mode_switcher_hover" name="mpsl_style_mode_switcher" data-mode="hover" />
-						            <label for="mpsl_style_mode_switcher_hover"><?php _e('Hover state', MPSL_TEXTDOMAIN) ?></label>
+						            <label for="mpsl_style_mode_switcher_hover"><?php _e('Hover state', 'motopress-slider') ?></label>
 					            </div>
 
 					            <div data-group="font-typography" class="mpsl-preset-allow-style-wrapper">
@@ -89,9 +89,9 @@ $presetsTableDisabled = '';
 
 	    <div class="mpsl-style-editor-footer">
 		    <fieldset>
-		        <button id="mpsl-apply-layer-preset" class="button-primary" <?php echo $btnDisabled; ?>><?php _e('Apply style', MPSL_TEXTDOMAIN); ?></button>
-		        <button id="mpsl-save-as-layer-preset" class="button-secondary" <?php echo $btnDisabled; ?>><?php _e('Duplicate', MPSL_TEXTDOMAIN); ?></button>
-		        <button id="mpsl-create-layer-preset" class="button-secondary" <?php echo $btnDisabled; ?>><?php _e('Create new preset', MPSL_TEXTDOMAIN); ?></button>
+		        <button id="mpsl-apply-layer-preset" class="button-primary" <?php echo $btnDisabled; ?>><?php _e('Apply style', 'motopress-slider'); ?></button>
+		        <button id="mpsl-save-as-layer-preset" class="button-secondary" <?php echo $btnDisabled; ?>><?php _e('Duplicate', 'motopress-slider'); ?></button>
+		        <button id="mpsl-create-layer-preset" class="button-secondary" <?php echo $btnDisabled; ?>><?php _e('Create new preset', 'motopress-slider'); ?></button>
 		    </fieldset>
 		    <?php
 		    

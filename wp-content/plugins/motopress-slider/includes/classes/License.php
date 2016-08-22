@@ -15,7 +15,7 @@ class MPSLLicense {
             add_settings_error(
                 'mpslLicense',
                 esc_attr('settings_updated'),
-                __('Settings saved.', MPSL_TEXTDOMAIN),
+                __('Settings saved.', 'motopress-slider'),
                 'updated'
             );
         }
@@ -26,8 +26,8 @@ class MPSLLicense {
         ?>
         <div class="wrap">
             <?php screen_icon('options-general'); ?>
-            <h2><?php _e('Slider License', MPSL_TEXTDOMAIN); ?></h2>
-            <i><?php _e("The License Key is required in order to get automatic plugin updates and support. You can manage your License Key in your personal account. <a href='https://motopress.zendesk.com/hc/en-us/articles/202812996-How-to-use-your-personal-MotoPress-account' target='blank'>Learn more</a>.", MPSL_TEXTDOMAIN); ?></i>
+            <h2><?php _e('Slider License', 'motopress-slider'); ?></h2>
+            <i><?php _e("The License Key is required in order to get automatic plugin updates and support. You can manage your License Key in your personal account. <a href='https://motopress.zendesk.com/hc/en-us/articles/202812996-How-to-use-your-personal-MotoPress-account' target='blank'>Learn more</a>.", 'motopress-slider'); ?></i>
             <?php settings_errors('mpslLicense', false); ?>
             <form action="" method="POST" autocomplete="off">
                 <?php wp_nonce_field('edd_mpsl_nonce', 'edd_mpsl_nonce'); ?>
@@ -35,7 +35,7 @@ class MPSLLicense {
                     <tbody>
                     <tr valign="top">
                         <th scope="row" valign="top">
-                            <?php echo __('License Key', MPSL_TEXTDOMAIN) . " (" . $mpsl_settings['license_type'] . ")"; ?>
+                            <?php echo __('License Key', 'motopress-slider') . " (" . $mpsl_settings['license_type'] . ")"; ?>
                         </th>
                         <td>
                             <input id="edd_mpsl_license_key" name="edd_mpsl_license_key" type="password"
@@ -48,7 +48,7 @@ class MPSLLicense {
                     <?php if ($license) { ?>
                         <tr valign="top">
                             <th scope="row" valign="top">
-                                <?php _e('Status', MPSL_TEXTDOMAIN); ?>
+                                <?php _e('Status', 'motopress-slider'); ?>
                             </th>
                             <td>
                                 <?php
@@ -56,28 +56,28 @@ class MPSLLicense {
                                     switch($licenseData->license) {
                                         case 'inactive' :
                                         case 'site_inactive' :
-                                            _e('Inactive', MPSL_TEXTDOMAIN);
+                                            _e('Inactive', 'motopress-slider');
                                             break;
                                         case 'valid' :
 											if ($licenseData->expires !== 'lifetime') {
 												$date = ($licenseData->expires) ? new DateTime($licenseData->expires) : false;
 												$expires = ($date) ? ' ' . $date->format('d.m.Y') : '';
-												echo __('Valid until', MPSL_TEXTDOMAIN) . $expires;
+												echo __('Valid until', 'motopress-slider') . $expires;
 											} else {
-												echo __('Valid (Lifetime)', MPSL_TEXTDOMAIN);
+												echo __('Valid (Lifetime)', 'motopress-slider');
 											}
                                             break;
                                         case 'disabled' :
-                                            _e('Disabled', MPSL_TEXTDOMAIN);
+                                            _e('Disabled', 'motopress-slider');
                                             break;
                                         case 'expired' :
-                                            __e('Expired', MPSL_TEXTDOMAIN);
+                                            __e('Expired', 'motopress-slider');
                                             break;
                                         case 'invalid' :
-                                            _e('Invalid', MPSL_TEXTDOMAIN);
+                                            _e('Invalid', 'motopress-slider');
                                             break;
                                         case 'item_name_mismatch' :
-                                            _e("Your License Key does not match the installed plugin. <a href='https://motopress.zendesk.com/hc/en-us/articles/202957243-What-to-do-if-the-license-key-doesn-t-correspond-with-the-plugin-license' target='_blank'>How to fix this.</a>", MPSL_TEXTDOMAIN);
+                                            _e("Your License Key does not match the installed plugin. <a href='https://motopress.zendesk.com/hc/en-us/articles/202957243-What-to-do-if-the-license-key-doesn-t-correspond-with-the-plugin-license' target='_blank'>How to fix this.</a>", 'motopress-slider');
                                             break;
                                     }
                                 }
@@ -87,7 +87,7 @@ class MPSLLicense {
                         <?php if (isset($licenseData->license) && in_array($licenseData->license, array('inactive', 'site_inactive', 'valid', 'expired'))) { ?>
                         <tr valign="top">
                             <th scope="row" valign="top">
-                                <?php _e('Action', MPSL_TEXTDOMAIN); ?>
+                                <?php _e('Action', 'motopress-slider'); ?>
                             </th>
                             <td>
                                 <?php
@@ -95,17 +95,17 @@ class MPSLLicense {
                                     if ($licenseData->license === 'inactive' || $licenseData->license === 'site_inactive') {
                                         wp_nonce_field('edd_mpsl_nonce', 'edd_mpsl_nonce'); ?>
                                         <input type="submit" class="button-secondary" name="edd_license_activate"
-                                               value="<?php _e('Activate License', MPSL_TEXTDOMAIN); ?>"/>
+                                               value="<?php _e('Activate License', 'motopress-slider'); ?>"/>
                                     <?php
                                     } elseif ($licenseData->license === 'valid') {
                                         wp_nonce_field('edd_mpsl_nonce', 'edd_mpsl_nonce'); ?>
                                         <input type="submit" class="button-secondary" name="edd_license_deactivate"
-                                               value="<?php _e('Deactivate License', MPSL_TEXTDOMAIN); ?>"/>
+                                               value="<?php _e('Deactivate License', 'motopress-slider'); ?>"/>
                                     <?php
                                     } elseif ($licenseData->license === 'expired') { ?>
                                         <a href="<?php echo $mpsl_settings['renew_url']; ?>"
                                            class="button-secondary"
-                                           target="_blank"><?php _e('Renew License', MPSL_TEXTDOMAIN); ?></a>
+                                           target="_blank"><?php _e('Renew License', 'motopress-slider'); ?></a>
                                     <?php
                                     }
                                 }
@@ -116,7 +116,7 @@ class MPSLLicense {
                     <?php } ?>
                     </tbody>
                 </table>
-                <?php submit_button(__('Save', MPSL_TEXTDOMAIN)); ?>
+                <?php submit_button(__('Save', 'motopress-slider')); ?>
             </form>
         </div>
     <?php
@@ -282,14 +282,14 @@ class MPSLLicense {
                     ?>
                     <div class="error">
                         <a id="mpsl-dismiss-license-notice" href="javascript:void(0);" style="float: right;padding-top: 9px; text-decoration: none;">
-                            <?php _e("Dismiss ", MPSL_TEXTDOMAIN); ?><strong>X</strong>
+                            <?php _e("Dismiss ", 'motopress-slider'); ?><strong>X</strong>
                         </a>
                         <p>
                         <?php _e(sprintf(
                             "<b>%s:</b> Your License Key is not active. Please, <a href='%s'>activate your License Key</a> to get plugin updates",
                             $mpsl_settings['product_name'],
                             admin_url('admin.php?page=motopress-slider-license')
-                        ), MPSL_TEXTDOMAIN); ?>
+                        ), 'motopress-slider'); ?>
                         </p>
                     </div>
                     <script type="text/javascript">
@@ -329,7 +329,7 @@ class MPSLLicense {
 
     public function addMenu(){
         global $mpsl_settings;
-        $licenseHook = add_submenu_page($mpsl_settings['plugin_name'], __('License', MPSL_TEXTDOMAIN), __('License', MPSL_TEXTDOMAIN), 'manage_options', 'motopress-slider-license', array($this, 'renderPage'));
+        $licenseHook = add_submenu_page($mpsl_settings['plugin_name'], __('License', 'motopress-slider'), __('License', 'motopress-slider'), 'manage_options', 'motopress-slider-license', array($this, 'renderPage'));
         add_action('load-' . $licenseHook, array($this, 'save'));
     }
 }

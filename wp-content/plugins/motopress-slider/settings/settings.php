@@ -6,6 +6,7 @@ global $wpdb, $wp_version;
 
 $mpsl_settings['debug'] = false;
 $mpsl_settings['prefix'] = 'mpsl_';
+$mpsl_settings['alt_prefix'] = 'mpsl-';
 $mpsl_settings['admin_url'] = get_admin_url();
 $mpsl_settings['plugin_root'] = WP_PLUGIN_DIR;
 $mpsl_settings['plugin_root_url'] = plugins_url();
@@ -25,8 +26,8 @@ if (version_compare($wp_version, '3.9', '<')) {
 $mpsl_settings['sliders_table'] = $wpdb->prefix . 'mpsl_sliders';
 $mpsl_settings['slides_table'] = $wpdb->prefix . 'mpsl_slides';
 $mpsl_settings['preview_slides_table'] = $wpdb->prefix . 'mpsl_slides_preview';
-$mpsl_settings['core_version'] = '1.1.8';
-$mpsl_settings['canjs_version'] = '2.1.4';
+$mpsl_settings['core_version'] = '1.2.3';
+$mpsl_settings['canjs_version'] = '2.3.22';
 $mpsl_settings['codemirror_version'] = '3.12';
 $mpsl_settings['spectrum_version'] = '1.7.1';
 $mpsl_settings['shortcode_name'] = 'mpsl';
@@ -43,5 +44,3 @@ $mpsl_settings['renew_url'] = $pluginData['PluginURI'] . 'buy/';
 
 
 $GLOBALS['mpsl_settings'] = $mpsl_settings;
-
-define('MPSL_TEXTDOMAIN', 'mpsl');

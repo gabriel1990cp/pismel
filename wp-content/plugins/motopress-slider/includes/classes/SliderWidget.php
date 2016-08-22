@@ -5,7 +5,7 @@ class MPSLWidget extends WP_Widget
 
     function __construct() {
         global $mpsl_settings;
-        parent::__construct(false, $mpsl_settings['product_name'], array('description' => sprintf(__('Add %s', MPSL_TEXTDOMAIN), $mpsl_settings['product_name'])));
+        parent::__construct(false, $mpsl_settings['product_name'], array('description' => sprintf(__('Add %s', 'motopress-slider'), $mpsl_settings['product_name'])));
     }
 
     public function widget($args, $instance) {
@@ -20,10 +20,10 @@ class MPSLWidget extends WP_Widget
         $alias = isset($instance['alias']) ? $instance['alias'] : '';
         ?>
         <p>
-            <label for="<?php echo $this->get_field_id('alias'); ?>"><?php _e('Select slider:', MPSL_TEXTDOMAIN); ?></label>
+            <label for="<?php echo $this->get_field_id('alias'); ?>"><?php _e('Select slider:', 'motopress-slider'); ?></label>
             <select class="widefat" id="<?php echo $this->get_field_id('alias'); ?>"
                     name="<?php echo $this->get_field_name('alias'); ?>">
-                <option><?php echo '-- ' . __('SELECT', MPSL_TEXTDOMAIN) . ' --'; ?></option>
+                <option><?php echo '-- ' . __('SELECT', 'motopress-slider') . ' --'; ?></option>
                 <?php foreach ($list as $value) : ?>
 
                     <option <?php echo $value['alias'] === $alias ? " selected " : ""; ?>

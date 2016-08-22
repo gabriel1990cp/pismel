@@ -1,5 +1,7 @@
 <?php
 
+/** @todo: Maybe make preview styles like in MPCE (transient OR parent.window variable) */
+
 require_once dirname(__FILE__) . '/ChildOptions.php';
 
 class MPSLLayerPresetOptions extends MPSLChildOptions {
@@ -34,7 +36,7 @@ class MPSLLayerPresetOptions extends MPSLChildOptions {
 		$this->lastPresetId = get_option(self::LAST_PRESET_ID_OPT, self::LAST_PRESET_ID_DEFAULT);
 		$this->lastPrivatePresetId = get_option(self::LAST_PRIVATE_PRESET_ID_OPT, self::LAST_PRESET_ID_DEFAULT);
 
-		$this->defaultPresets = include($this->pluginDir . 'defaults/presets.php');
+		$this->defaultPresets = include($this->pluginDir . 'defaults/style-presets/presets.php');
 
 		$this->options = include($this->getSettingsPath());
 		$this->prepareOptions($this->options);
@@ -45,7 +47,7 @@ class MPSLLayerPresetOptions extends MPSLChildOptions {
 
 		if (!$loaded) {
 			// TODO: Throw error
-//            _e('Record not found', MPSL_TEXTDOMAIN);
+//            _e('Record not found', 'motopress-slider');
 		}
 	}
 
