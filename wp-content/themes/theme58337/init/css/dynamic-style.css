@@ -1,0 +1,600 @@
+html {
+    @typography( $typography-body )
+}
+.isStick{
+	box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
+	background: $header-background[color];
+}
+.isStick#menu-primary{
+	background: $body-background[color];
+}
+
+/* Header */
+.site-header {
+	border-color: $color-gray-variations;
+}
+.site-header.wide .container {
+	max-width: none;
+}
+
+/* Navigation (Menu) */
+#menu-primary > .menu-items > .menu-item > a {
+	color: $typography-header-menu[color];
+}
+#menu-primary > .menu-items > .menu-item.current-menu-item > a,
+/*#menu-primary > .menu-items > .menu-item.cherry-mega-menu-hover > a,*/
+#menu-primary > .menu-items > .menu-item > a:hover {
+	color: $color-link;
+}
+#menu-primary .sub-menu,
+#menu-primary .cherry-mega-menu-sub,
+#menu-primary .cherry-mega-menu-sub.simple-sub {
+	background: none;
+}
+#menu-primary .sub-menu .menu-item > a:hover,
+#menu-primary .cherry-mega-menu-sub > a:hover {
+	color: $color-link-hover;
+}
+#menu-primary .cherry-mega-menu-sub .megamenu-post-wrap .btn {
+	color: @contrast( $color-primary, #fff, $color-secondary );
+	background: $color-primary;
+}
+#menu-primary .cherry-mega-menu-sub .megamenu-post-wrap .btn:hover {
+	color: @contrast( $color-secondary, #fff, $color-primary );
+	background: $color-secondary;
+}
+#menu-primary > #menu-primary-items .sub-menu li a, 
+#menu-primary > #menu-primary-items .cherry-mega-menu-sub li a, 
+#menu-primary > #menu-primary-items .cherry-mega-menu-sub.simple-sub li a {
+	@typography( $typography-header-menu );
+	font-size: @font_size( $typography-header-menu[size], multiple, ceil, 0.5 )px;
+	line-height: 1.2em;
+}
+#menu-primary > #menu-primary-items .sub-menu li a:hover, 
+#menu-primary > #menu-primary-items .cherry-mega-menu-sub li a:hover, 
+#menu-primary > #menu-primary-items .cherry-mega-menu-sub.simple-sub li a:hover {
+	color: $color-link;
+}
+
+#menu-primary > #menu-primary-items .sub-menu li a, #menu-primary > #menu-primary-items .cherry-mega-menu-sub li a, #menu-primary > #menu-primary-items .cherry-mega-menu-sub.simple-sub li a
+
+#menu-secondary .menu-item > a {
+	color: $color-link-hover;
+}
+#menu-secondary .menu-item > a:hover,
+#menu-secondary .menu-item.current-menu-item > a,
+.widget.widget_nav_menu ul.menu li.current-menu-item a {
+	color: $color-link;
+	text-decoration: underline;
+}
+
+/*  mega menu mobile */
+#menu-primary .cherry-mega-menu-mobile-trigger,
+#menu-primary .cherry-mega-menu-mobile-close {
+	color: @contrast( $color-primary, #fff, $color-secondary );
+	background: $color-primary;
+}
+
+/* simple menu mobile */
+@media ( max-width:@menu_toogle_endpoint()px ) {
+	#menu-primary .menu-primary_trigger {
+		text-align:left;
+		border:none;
+		width:100%;
+		color: @contrast( $color-primary, #fff, $color-secondary );
+		background: $color-primary;
+	}
+	#menu-primary #menu-primary-items > .menu-item {
+		float:none;
+		width:auto !important;
+		margin:5px 0 0;
+	}
+	#menu-primary > #menu-primary-items > .menu-item > a {
+		padding:10px;
+	}
+	#menu-primary > #menu-primary-items .sub-menu .sub-menu {
+		padding:0;
+		margin:0 0 0 20px;
+	}
+}
+
+
+
+/* Logo */
+.site-title {
+	@typography( $typography-header-logo )
+}
+.site-link:hover {
+	color: $typography-header-logo[color];
+}
+.site-title.text-logo a
+.site-description {
+	color: $typography-header-logo[color];
+	border-color: $typography-header-logo[color];
+}
+.opened .site-title.text-logo a,
+.opened .site-description {
+	color: white;
+	border-color: white;
+}
+
+/* Pagination */
+/*Blog posts list pagination*/
+.navigation.pagination .nav-links .page-numbers {
+	color: $color-link;
+}
+.navigation.pagination .nav-links .page-numbers:hover {
+	color: @darken( $color-link , 20 );
+}
+.navigation.pagination .nav-links .page-numbers.current,
+.navigation.pagination .nav-links .page-numbers.current:hover {
+	color: $color-link-hover;
+}
+.swiper-container .swiper-pagination .swiper-pagination-bullet-active,
+.swiper-pagination .swiper-pagination-bullet:hover {
+	background: $color-secondary;
+}
+.swiper-container .cherry-swiper-carousel-slide .meta .company {
+	color: $color-secondary;
+}
+
+/*Blog single post prev/next navigation*/
+.paging-navigation .nav-links a {
+	color: $color-secondary;
+	border:2px solid $color-secondary;
+}
+.paging-navigation .nav-links a:hover {
+	color: @contrast( $color-primary, #fff, $color-secondary );
+	border-color: $color-primary;
+	background: $color-primary;
+}
+
+	/*Portfolio list pagination*/
+.portfolio-wrap .portfolio-container .portfolio-pagination ul.page-link li a,
+.portfolio-wrap .portfolio-container .portfolio-pagination .page-nav a {
+	color: $color-link;
+	background: $color-gray-variations;
+}
+.portfolio-wrap .portfolio-container .portfolio-pagination ul.page-link li a:hover,
+.portfolio-wrap .portfolio-container .portfolio-pagination .page-nav a:hover {
+	color: @darken( $color-link , 20 );
+}
+.portfolio-wrap .portfolio-container .portfolio-pagination ul.page-link li.active a {
+	color: $color-link-hover;
+}
+body.single-portfolio .swiper-button-prev, 
+body.single-portfolio .swiper-button-next {
+	background: $color-link-hover;
+}
+body.single-portfolio .swiper-button-prev:hover, 
+body.single-portfolio .swiper-button-next:hover {
+	background: $color-link;
+}
+.cherry-breadcrumbs_item_target,
+.cherry-breadcrumbs_item_link:hover {
+	color: $color-link;
+}
+.portfolio-wrap .portfolio-container .portfolio-list .portfolio-item .zoomlink.item-link:hover {
+	color: $color-primary;
+}
+
+/* Shortcodes */
+
+/* button */
+.cherry-btn.cherry-btn-primary,
+.entry-permalink a,
+.search-form .search-submit {
+	background: $color-link;
+	color: @contrast( $color-primary, #fff, $color-secondary );
+}
+.cherry-btn.cherry-btn-primary:hover,
+.entry-permalink a:hover,
+.search-form .search-submit:hover {
+	background: $color-link-hover;
+}
+.cherry-btn-primary-light {
+	color: $color-link;
+}
+.cherry-btn-primary-light:hover {
+	background: $color-primary;
+	color: @contrast( $color-primary, #fff, $color-secondary );
+}
+.cherry-btn-default {
+	color: $color-secondary;
+	border-color: $color-secondary;
+}
+.cherry-btn-default:hover {
+	border-color: $color-primary;
+	background: $color-primary;
+	color: @contrast( $color-primary, #fff, $color-secondary );
+}
+.cherry-btn-gray {
+	background: $color-gray-variations;
+	color: $color-primary;
+}
+.cherry-btn-gray:hover {
+	color: @contrast( $color-primary, #fff, $color-secondary );
+	background: $color-secondary;
+}
+
+/* cherry icon */
+.cherry-icon {
+	color: $color-primary;
+}
+
+/* cherry team  */
+.team-listing .team-item .showed-content .hovered-content:before {
+	background: $color-secondary;
+}
+.team-listing .team-item .team-title-wrap .team-listing_name a:hover,
+.post-type-archive-team .team-wrap .team-listing_item .team-listing_name a:hover {
+	color: $color-secondary;
+}
+
+.cherry-posts-list.template-latest_articles .cherry-posts-item .item-content:before {
+	background: $color-primary;
+}
+
+/* cherry serivces */
+.services-listing .theme-services .features-circle {
+	background: $color-secondary;
+	color: @contrast( $color-secondary, #fff, $color-primary );
+}
+.services-listing .theme-services .cherry-services_title,
+.services-listing .theme-services .cherry-services_title a {
+	@typography( $typography-h4 );
+}
+.services-listing .theme-services .cherry-services_title a:hover {
+	color: $color-link;
+}
+.services-listing .theme-services .features-circle:not(:empty) .cherry-services_feauters {
+	@typography( $typography-h4 );
+	color: @contrast( $color-secondary, #fff, $color-primary );
+}
+.services-listing .theme-services {
+	border-color: $color-gray-variations;
+}
+.single-service .service.type-service .service-meta .cherry-services_title {
+	@typography( $typography-h4 );
+}
+.single-service .service.type-service .service-meta .cherry-services_feauters {
+	color: $color-secondary;
+}
+
+.swiper-button-prev:before {
+	@swiper_button_prev()
+}
+.swiper-button-next:before {
+	@swiper_button_next()
+}
+.swiper-button-prev:hover:before,
+.swiper-button-next:hover:before {
+	color: $color-secondary;
+}
+
+
+/* Portfolio */
+.portfolio-wrap .filter li a:hover,
+.portfolio-wrap .filter li.active a,
+.portfolio-wrap .order-filter > li:hover{
+	color: $color-secondary;
+}
+.portfolio-wrap .order-filter li ul li{
+	color: $typography-body[color];
+}
+.portfolio-wrap .order-filter li ul li:hover{
+	color: $color-primary;
+	text-decoration: none;
+}
+.portfolio-wrap .portfolio-container .portfolio-list .portfolio-item .item-content:before,
+.portfolio-wrap .portfolio-container .portfolio-list .portfolio-item .rollover-content:before,
+.post-featured-image .magnific-popup-zoom:before {
+	background: $color-secondary;
+}
+
+
+/* grid standart */
+div.portfolio-wrap div.portfolio-item .inner-wrap .links-container .item-link{
+	color: $color-white;
+}
+div.portfolio-wrap div.portfolio-item .inner-wrap .links-container .item-link:hover{
+	color: $color-link-hover;
+	border-color: $color-link-hover;
+}
+
+/* grid custom */
+div.portfolio-wrap div.portfolio-item .inner-wrap.portfolio-grid .links-container .item-link{
+	color: @lighten( $color-secondary, 100);
+}
+div.portfolio-wrap div.portfolio-item .inner-wrap.portfolio-grid .links-container .item-link:hover{
+	color: @lighten( $color-secondary, 100);
+	border-color: @lighten( $color-secondary, 100);
+}
+
+/* justified  standart */
+.portfolio-wrap .portfolio-container .portfolio-item.justified-layout-item .rollover-content h3 a:hover {
+	color: $color-primary;
+}
+
+/* justified custom */
+div.portfolio-wrap div.portfolio-item .inner-wrap.portfolio-justified .links-container .item-link{
+	color: @lighten( $color-secondary, 100);
+}
+div.portfolio-wrap div.portfolio-item .inner-wrap.portfolio-justified .links-container .item-link:hover{
+	color: $color-secondary;
+	border-color: @lighten( $color-secondary, 100);
+}
+
+
+.portfolio-wrap .portfolio-container .portfolio-item .custom-links .zoomlink:hover {
+	background: $color-primary;
+}
+.portfolio-wrap .portfolio-container .portfolio-item .custom-links .permalink:hover {
+	color: $color-primary;
+}
+
+.portfolio-wrap .portfolio-container .portfolio-ajax-button .load-more-button a {
+	color: @contrast( $color-primary, #fff, $color-secondary );
+	background: $color-primary;
+}
+.portfolio-wrap .portfolio-container .portfolio-ajax-button .load-more-button a:hover {
+	color: @contrast( $color-secondary, #fff, $color-primary );
+	background: $color-secondary;
+}
+.cherry-spinner-double-bounce .cherry-double-bounce1, .cherry-spinner-double-bounce .cherry-double-bounce2 {
+	background-color: $color-primary;
+}
+
+body.single-portfolio article.type-portfolio .cherry-portfolio-single-post .post-meta-container,
+body.single-portfolio article.type-portfolio .cherry-portfolio-single-post .post-meta-container .post-date,
+body.single-portfolio article.type-portfolio .cherry-portfolio-single-post,
+body.single-portfolio article.type-portfolio .cherry-portfolio-single-post a {
+	color: $color-primary;
+}
+body.single-portfolio article.type-portfolio .cherry-portfolio-single-post a:hover {
+	color: $color-secondary;
+}
+
+/* Blog */
+
+.entry-title a {
+	color: $color-link-hover;
+}
+.entry-meta {
+	color: @darken($color-gray-variations, 40);
+}
+.entry-meta span:after,
+.portfolio-wrap .portfolio-filter > ul:after {
+	background: @darken($color-gray-variations, 40);
+}
+.author-bio {
+	background: $color-gray-variations;
+}
+.author-bio h3, 
+.related-posts_title, 
+.comment-reply-title, 
+.comments-title {
+	font-size: $typography-h5[size]px;
+	line-height: $typography-h5[lineheight]px;
+}
+textarea {
+	@typography( $typography-input-text )
+}
+
+/* Comments */
+
+.comments-area .comment .comment-body {
+	background: $color-gray-variations;
+}
+.comment-metadata,
+.comment-reply-link {
+	font-size: @font_size( $typography-body[size], multiple, ceil, 0.66 )px;
+	line-height: @font_size( $typography-body[lineheight], multiple, ceil, 0.66 )px;
+	color: @darken($color-gray-variations, 40);
+}
+.reply a {
+	color: $color-link;
+	
+}
+.reply a:hover {
+	color: @darken($color-gray-variations, 40);
+}
+input[type="reset"],
+.comments .comment-respond form .form-submit .reset,
+.wpcf7 form .submit-wrap input[type="reset"] {
+	background: none;
+	color: @darken($color-gray-variations, 30);
+	border-color:  $color-gray-variations;
+}
+input[type="reset"]:hover,
+.comments .comment-respond form .form-submit .reset:hover,
+.wpcf7 form .submit-wrap input[type="reset"]:hover {
+	background: $color-gray-variations;
+	border-color: $color-gray-variations;
+}
+
+.comment-respond form input,
+.comment-respond form textarea,
+.wpcf7 input,
+.wpcf7 textarea {
+	background: $color-gray-variations;
+}
+
+.comment-respond form .form-submit .submit,
+.wpcf7 form .submit-wrap input[type="submit"] {
+	color: @contrast( $color-link, #fff, $color-link-hover );
+	background: $color-link;
+}
+.comment-respond form .form-submit .submit:hover,
+.wpcf7 form .submit-wrap input[type="submit"]:hover {
+	color: @contrast( $color-link, #fff, $color-link-hover );
+	background: @lighten($color-link, 15);
+}
+
+
+
+/* Contact form */
+
+.wpcf7 .submit-wrap input {
+	color: @contrast( $color-primary, #fff, $color-secondary );
+	background: $color-primary;
+}
+.wpcf7 .submit-wrap input:hover {
+	background: @darken( $color-primary, 20 );
+}
+.wpcf7 .submit-wrap input[type="reset"] {
+	color: @contrast( $color-secondary, #fff, $color-primary );
+	background: $color-secondary;
+}
+.wpcf7 .submit-wrap input[type="reset"]:hover {
+	background: @darken( $color-secondary, 20 );
+}
+.wpcf7 .submit-wrap img.ajax-loader {
+	border-color: transparent transparent $color-primary $color-primary;
+}
+
+
+/* Widgets */
+.static-footer-sidebar-4 .widget-area:not(:empty) {
+	@call_to_action_bg();
+}
+.site-content .widget {
+	background: $color-gray-variations;
+}
+.site-content .widget-title {
+	font-size: $typography-h6[size]px;
+	line-height: $typography-h6[lineheight]px;
+}
+.widget > ul > li:before {
+	color:  $color-secondary;
+}
+.widget_recent_comments li.recentcomments {
+	color: $typography-body[color];
+}
+.widget_recent_comments li.recentcomments .comment-author-link {
+	color: $color-primary;
+}
+.widget.widget_categories ul li, 
+.widget.widget_archive ul li,
+.template-widget_popular_posts .post-title {
+	font-size: @font_size( $typography-body[size], multiple, ceil, 0.88 )px;
+	line-height: @font_size( $typography-body[lineheight], multiple, ceil, 0.88 )px;
+}
+.widget.widget_categories ul li a, 
+.widget.widget_archive ul li a,
+.template-widget_popular_posts .post-title a {
+	color: $color-primary;
+}
+.widget.widget_categories ul li a:hover, 
+.widget.widget_archive ul li a:hover,
+.template-widget_popular_posts .post-title a:hover {
+	color: $color-link;
+}
+.template-widget_popular_posts .post-content,
+.template-widget_popular_posts .post-meta {
+	color: @darken( $color-gray-variations, 40 );
+}
+
+/* Search */
+.search-form .search-field {
+	border-color: $color-gray-variations;
+	background: white;
+}
+
+/* Static */
+#static-area-header-bottom .static-header-sidebar {
+	font-family: $typography-header-menu[family];
+}
+
+/* MotoPress Slider */
+.timer-bullet .timer {
+	background: $color-secondary;
+}
+
+/* Footer */
+.site-footer {
+	background: none;
+}
+@background( .footer-bottom.static-area, $footer-background )
+
+.footer-logo-link:hover {
+	color: $typography-footer-logo[color];
+}
+.static-footer-sidebars .widget-title,
+.static-footer-sidebar-4 .widget-title {
+	font-size: $typography-h6[size]px;
+	line-height: $typography-h6[lineheight]px;
+	color: $color-link;
+}
+.static-footer-sidebars ul.menu li a:hover,
+.site-footer a:not(.cherry-btn):hover,
+.static-footer-sidebars .cherry-follow_wrap .cherry-follow_list .cherry-follow_item a:hover {
+	color: $color-link;
+}
+
+/* Back to Top */
+
+#back-top a {
+	background: $color-primary;
+}
+#back-top a:hover{
+	background: $color-secondary;
+}
+
+/* Everything */
+.static-social-follow .cherry-follow_wrap .cherry-follow_list .cherry-follow_item a i {
+	color: $color-link-hover;
+}
+.static-social-follow .cherry-follow_wrap .cherry-follow_list .cherry-follow_item a:hover i,
+#static-area-header-bottom .static-header-sidebar a:hover {
+	color: $color-link;
+}
+#static-area-header-bottom:before,
+.static-header-logo .hamburger,
+.opened .static-header-logo .hamburger .lines:before,
+.opened .static-header-logo .hamburger .lines:after {
+	background: $color-link-hover;
+}
+.static-header-logo .hamburger:hover {
+	background: $color-link;
+}
+small, 
+.small,
+.logged-in-as,
+.comment-notes {
+	color: $typography-body[color];
+	font-size: @font_size( $typography-body[size], multiple, ceil, 0.77 )px;
+	line-height: @font_size( $typography-body[lineheight], multiple, ceil, 0.75 )px;
+	display: inline-block;
+}
+blockquote {
+	border-color: $color-primary;
+}
+/* Color classes */
+.white-color {
+	color: white;
+}
+.primary-color {
+	color: $color-primary;
+}
+.secondary-color {
+	color: $color-secondary;
+}
+.link-color {
+	color: $color-link;
+}
+.link-hover-color {
+	color: $color-link-hover;
+}
+.danger-color {
+	color: $color-danger;
+}
+.wraning-color {
+	color: $color-wraning;
+}
+.info-color {
+	color: $color-info;
+}
+.success-color {
+	color: $color-success;
+}

@@ -1,0 +1,61 @@
+$firstFontFamily: 'Raleway', sans-serif;
+$secondFontFamily: Arial, Helvetica, sans-serif;
+$fontawesome: 'FontAwesome';
+$fontello: 'fontello';
+
+$btn-padding-top-bottom: 19px;
+$btn-padding-right-left: 33px;
+
+.buttons-style {
+	font: bold 22px/1.2em $firstFontFamily;
+	text-transform: none;
+	padding: $btn-padding-top-bottom $btn-padding-right-left;
+	border-radius: 0;
+	display: inline-block;
+	letter-spacing: 0.5px;
+}
+
+.pagination-style {
+	border-radius: 0;
+	padding: 10px 17px;
+	font-size: 1.125rem;
+	line-height: 1.2em;
+	font-weight: bold;
+	display: inline-block;
+}
+
+.showed-hover-blocks {
+	.showed-content {
+		overflow: hidden;
+		position: relative;
+
+		.hovered-content {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			z-index: 10;
+			padding: 20px 40px;
+			@include transform(translate3d(0, 100%, 0));
+			@include transition(200ms all cubic-bezier(0.7, 0, 0.3, 1));
+
+			&:before {
+				content: '';
+				width: 110%;
+				height: 110%;
+				position: absolute;
+				top: 0;
+				left: 0;
+				opacity: .8;
+				background: #000;
+				z-index: -1;
+			}
+		}
+	}
+	&:hover {
+		.hovered-content {
+			@include transform(translate3d(0, 0, 0));
+		}
+	}
+}

@@ -1,0 +1,257 @@
+/*
+Description: The stylesheet with a widget style.
+Author:      Cherry Team
+Version:     1.0.0
+*/
+
+/* #Widgets
+================================================== */
+.cherry-sidebar-main {
+	&.sidebar-main {
+		padding: 0 0 0 8px;
+	}
+}
+.widget {
+	margin: 50px 0 0;
+
+	.site-content & {
+		padding: 40px;
+	}
+	&:first-child {
+		margin: 0;
+	}
+	> ul {
+		padding: 0;
+		list-style: none;
+		
+		> li {
+			position: relative;
+			padding: 0 0 10px 18px;
+			
+			&:before {
+				position: absolute;
+				top: 0;
+				left: 0;
+				content: '\f105';
+				font: 15px/20px FontAwesome;
+			}
+			ul {
+				padding: 0 0 0 15px;
+				list-style: none;
+			}
+		}
+	}
+	&.widget_categories,
+	&.widget_archive {
+		> ul {
+			li {
+				padding: 13px 0 0;
+				font-family: $firstFontFamily;
+
+				&:first-child {
+					padding: 0;
+				}
+				&:before {
+					display: none;
+				}
+				a {
+					text-decoration: underline;
+				}
+			}
+		}
+	}
+	&.widget_nav_menu {
+		ul.menu {
+			padding: 0;
+			list-style-type: none;
+
+			li {
+				&.current-menu-item {
+					a {
+						text-decoration: underline;
+					}
+				}
+			}
+		}
+	}
+}
+.widget.widget_recent_comments {
+	ul {
+		li.recentcomments {
+			padding-left: 25px;
+			text-transform: lowercase;
+			
+			&:before {
+				content:'\f075';
+			}			
+			.comment-author-link {
+				text-transform: uppercase;
+			}
+			a {
+				text-transform: none;
+			}
+		}
+	}
+}
+.cherry_team_widget {
+	.team-item {
+		text-align:center;
+		margin-bottom:35px;
+		
+		.team-listing_photo {
+			margin-bottom:25px;
+		}
+		.team-listing_name {
+			font-weight:bold;
+			margin-bottom:10px;
+		}
+	}
+}
+.template-widget_popular_posts {
+	.cherry-posts-item {
+		padding-top: 40px;
+
+		&:first-child {
+			padding-top: 0;
+		}
+	}
+	.post{
+		&-thumbnail {
+			margin: 0 0 20px;
+		}
+		&-title {
+			margin: 0 0 10px;
+			font-family: $firstFontFamily;
+
+			a {
+				text-decoration: underline;
+			}
+		}
+		&-content {
+			font-size: 0.77rem;
+			line-height: 1.64em;
+			margin: 0 0 10px;
+		}
+		&-meta {
+			font-weight: bold;
+			font-size: 0.66rem;
+			line-height: 1.2em;
+			text-transform: uppercase;
+		}
+	}
+}
+.cherry_testimonials_widget {
+	.testimonials-item {
+		.avatar {
+			.two-sidebars & {
+				float: none;
+			}
+		}
+		blockquote {
+			border: none;
+			padding: 0;
+			font-size: 1rem;
+			line-height: 1.2em;
+		}
+	}
+}
+
+/* Static
+================================================== */
+.static-social-follow {	
+	margin-bottom:30px;
+	
+	.cherry-follow_list {
+		.cherry-follow_item {
+			margin-left:20px;
+			
+			.cherry-follow_link {
+				display:inline-block;
+				width: 50px;
+				height: 50px;
+				opacity:1;
+				text-align:center;
+				border-radius:10px;
+				
+				.align-right & {
+					text-align: right;
+				}
+				i:before {
+					font-size:25px;
+					line-height:50px;
+				}
+			}
+			
+			&:first-child {
+				margin-left: 0;
+			}
+		}
+	}
+}
+
+.static-footer-sidebar-4 {
+	padding: 0;
+
+	.widget-title {
+		text-align: center;
+	}
+	.widget {
+		&.cherry-shortcodes {
+			.container {
+				padding: 0 15px;
+			}
+			.row {
+				margin: 0;
+			}
+		}
+	}
+}
+
+/* Search
+================================================== */
+.search-form {
+	label {
+		display: block;
+	}
+	.search-field {
+		padding: 0 20px;
+		height: 50px;
+		line-height: 50px;
+		border-width: 1px;
+		border-style: solid;
+		margin: 0 0 20px;
+		width: 100%;
+		max-width: 300px;
+		display: block;
+	}
+	.search-submit {
+		position: relative; 
+		@extend .buttons-style;
+		height: 50px;
+		line-height: 50px;
+		padding-top: 0;
+		padding-bottom: 0;
+	}
+}
+
+/* Two sidebars
+================================================== */
+.two-sidebars {
+	.site-content {
+		@media only screen and (min-width: $screen-md-min - 1) {
+			.widget {
+				font-size: .75rem;
+				line-height: 1.2em;
+				padding: 10px 15px;
+				margin-top: 20px;
+
+				&:first-child {
+					margin-top: 0;
+				}
+				.widget-title {
+					font-size: 1rem;
+				}
+			}
+		}
+	}
+}

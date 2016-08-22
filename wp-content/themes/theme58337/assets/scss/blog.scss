@@ -1,0 +1,426 @@
+/*
+Description: The stylesheet with a blog style.
+Author:      Cherry Team
+Version:     1.0.0
+*/
+
+.single {
+	.hentry {
+		margin: 0 0 30px;
+
+		article.hentry {
+			margin: 0;
+		}
+	}
+	article {
+		.entry-content {
+			margin: 0 0 40px;
+		}
+	}
+}
+.alignleft {
+	margin-right: 30px;
+}
+.hentry {
+	margin: 0 0 80px;
+	
+	.entry-thumbnail, 
+	.entry-video, 
+	.post-gallery_item, 
+	.entry-avatar, 
+	.mejs-container, 
+	.post-thumbnail, 
+	.video-player-container {
+		margin-bottom: 40px;
+	}
+}
+
+.entry-thumbnail.alignnone {
+	margin-right: 12px;
+}
+
+.entry-thumbnail.cherry-thumb-s.alignleft {
+	margin-right: 30px;
+	margin-bottom: 30px;
+}
+
+.entry-thumbnail.cherry-thumb-s.alignright {
+	margin-left: 30px;
+	margin-bottom: 30px;
+}
+
+.entry-title {
+	font-weight: bold;
+	
+	a {
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+}
+
+.entry-meta {
+	display: none;
+	font-size: 0.78rem;
+	line-height: 1.2em;
+	text-transform: uppercase;
+	font-weight: bold;
+	margin: 0 0 25px;
+
+	.single & {
+		display: block;
+	}
+	> span {
+		display: inline-block;
+
+		&:after {
+			content: '';
+			width: 4px;
+			height: 4px;
+			background: #ccc;
+			display: inline-block;
+			vertical-align: middle;
+			margin: 0 10px 0 14px;
+		}
+		&:last-child {
+			&:after {
+				display: none;
+			}
+		}
+	}
+}
+.entry-permalink a {
+	display: inline-block;
+	margin: 30px 0 0;
+}
+
+.author-bio {
+	padding: 40px;
+	margin-bottom: 20px;
+
+	section {
+		overflow: hidden;
+	}
+	&_descr {
+		top: -7px;
+		position: relative;
+	}
+	&_author {
+		display: inline-block;
+		margin: 0 0 15px;
+	}
+}
+
+.author-bio h3, 
+.related-posts_title, 
+.comments-title {
+	margin: 0 0 40px;
+}
+
+/*Related posts */
+.related-posts {
+	overflow: hidden;
+	padding: 30px 0;
+	
+	.related-posts_list {
+		list-style:none;
+		
+		.related-posts_item {
+			padding-bottom:40px;
+			
+			.entry-thumbnail {
+				margin: 0 0 35px;
+			}
+			.entry-title {
+				
+			}
+			.entry-content {
+
+			}
+		}
+	}
+}
+
+	/*Post gallery prev/next*/
+body .post-gallery_prev, body .post-gallery_next {
+	border-radius:5px;
+	color:#fff;
+	width:60px;
+	height:60px;
+	line-height:55px;
+}
+body .post-gallery_prev {
+	left:30px;
+}
+body .post-gallery_next {
+	right:30px;
+}
+
+
+
+/* #Comments
+================================================== */
+.page .comments-area {
+	margin-top: 40px;
+}
+ol.comment-list li > .children,
+ol.comment-list .children li > .children {
+  list-style: none;
+}
+
+.comments-area {
+	margin-top: 40px;
+
+	.single-portfolio & {
+		margin: 0;
+	}
+	.comment-list {
+		list-style: none;
+		padding-left: 0;
+		padding-bottom: 0;
+		
+		.comment {
+			margin-bottom: 30px;
+
+			.children {
+				margin: 40px 0 0;
+				position: relative;
+
+				&:before {
+					content: '';
+					width: 10px;
+					height: 10px;
+					background: #dedede;
+					position: absolute;
+					top: 0;
+					left: 0;					
+				}
+			}
+			.comment-metadata {
+				margin: 0;
+
+				&:after {
+					content: '/';
+					padding: 0 7px;
+				}
+			}
+			.reply {
+				text-align: right;
+				margin: 0;
+				
+				.comment-reply-link {
+					text-transform: uppercase;
+				}
+			}
+		}
+		.comment-body {
+			padding: 40px;
+
+			&:after {
+				content: '';
+				width: 100%;
+				height: 0;
+				display: block;
+				clear: both;
+			}
+		}
+		.comment-content {
+			&-wrap {
+				overflow: hidden;
+
+				.row {
+					margin: 0;
+
+					> div {
+						float: none;
+						width: auto;
+						display: inline-block;
+						padding: 0;
+					}
+				}
+			}
+			p {
+				margin: 0;
+			}
+		}
+		.comment-author {
+			&-name {
+				text-align: center;
+				margin: 10px 0 0;
+				display: block;
+			}
+		}
+	}
+}
+
+.comment-reply-title {
+	margin: 0 0 10px;
+}
+
+.comments {
+	.comment-respond {
+		padding-top: 20px;
+		
+		.logged-in-as {
+			margin: 0 0 8px;
+		}
+		form {
+			overflow:hidden;
+			
+			.row {
+				margin-bottom: 20px;
+				> div {
+					padding-left: 10px;
+					padding-right: 10px;
+				}
+			}
+			input[type="text"], 
+			input[type="email"], 
+			input[type="url"], 
+			textarea {
+				width: 100%;
+				border: none;
+			}
+			input[type="text"], 
+			input[type="email"], 
+			input[type="url"] {	
+				padding: 0 20px;
+				height: 50px;
+				line-height: 50px;
+			}
+			textarea {
+				padding: 10px 20px;
+			}
+			.comment-form-comment {
+				margin-bottom: 20px;
+			}			
+			.form-submit {
+				margin-bottom: 0;
+				
+				.submit,
+				.reset {
+					width: auto;
+					@extend .buttons-style;
+					padding: 11px 27px;
+					border-width: 2px;
+					border-style: solid;
+				}
+				.submit {
+					border-color: transparent;
+					margin: 0 20px 5px 0;
+				}
+			}
+		}
+	}
+}
+
+/* Pagination
+================================================== */
+	/*Blog posts list pagination*/
+.navigation.pagination {
+	clear: both;
+
+	.nav-links {
+		.page-numbers.current, 
+		.page-numbers {
+			@extend .pagination-style;
+			margin: 0 10px 10px 0;
+			background: #f2f2f2;
+		}
+	}
+}
+
+	/*Blog single post prev/next navigation*/
+.navigation.post-navigation {
+	overflow:hidden;
+	margin-bottom:50px;
+	
+	.nav-links {
+		a {
+			@extend .pagination-style;	
+		}
+		.nav-previous a{
+			margin-right:10px;
+		}
+		.nav-next a{
+			margin-left:10px;
+		}
+	}
+}
+
+body .post-gallery_prev, 
+body .post-gallery_next {
+	border-radius: 0;
+	margin-top: -30px;
+
+	&:before {
+		content: '';
+		width: 0;
+		height: 0;
+		border-style: solid;
+		border-width: 10px 10px 10px 0;
+		border-color: transparent #fff transparent transparent;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin: -10px 0 0 -5px;
+	}
+}
+body .post-gallery_next {
+	&:before {
+		width: 0;
+		height: 0;
+		border-style: solid;
+		border-width: 10px 0 10px 10px;
+		border-color: transparent transparent transparent #fff;
+	}
+}
+
+.post-gallery {
+	&.popup-gallery {
+		margin: 0 0 20px;
+
+		.post-gallery_item {
+			margin: 0;
+
+			.popup-gallery-item {
+				position: relative;
+				display: block;
+
+				&:before,
+				&:after {
+					content: '';
+					top: 0;
+					left: 0;
+					width: 100%;
+					height: 100%;
+					position: absolute;
+					background: #000;
+					opacity: .5;
+					@include transition(300ms all);
+					@include transform(scale(0));
+				}
+				&:after {
+					content: '\e800';
+					font: 42px/1em $fontello;
+					color: white;
+					top: 50%;
+					left: 50%;
+					width: 64px;
+					height: 42px;
+					background: none;
+					opacity: 1;
+					margin: -21px 0 0 -32px;
+					transition-delay: 50ms;
+					@include transform(scale(1, 0));
+				}
+				&:hover {
+					&:before,
+					&:after {
+						@include transform(scale(1));
+					}
+				}
+			}
+		}
+	}
+}

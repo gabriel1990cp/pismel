@@ -1,0 +1,345 @@
+/*
+Description: The stylesheet with a header style.
+Author:      Cherry Team
+Version:     1.0.0
+*/
+
+.site-header {
+	padding: 40px 0 39px;
+	z-index: 101;
+
+	.blog &,
+	.single & {
+		border-bottom-width: 2px;
+		border-bottom-style: solid;
+		position: relative;
+		padding-bottom: 69px;
+
+		&:before,
+		&:after {
+			content: "";
+			display: block;
+			height: 100%;
+			position: absolute;
+			top: 0;
+			width: 231%;
+			background: none;
+			border: inherit;
+			z-index: 1;
+			@include box-sizing(content-box);
+		}
+		&:before {
+			left: -230%;
+		}
+		&:after {
+			right: -230%;
+		}
+	}
+	&.wide {
+		.container {
+			max-width: inherit;
+		}
+	}
+	&.with-slider {
+		padding-bottom: 0;
+	}
+}
+// Header top area
+#static-area-header-top {
+	> .container {
+		z-index: 100;
+		position: relative;
+		padding-left: 40px;
+		padding-right: 40px;
+
+		> .row {
+			> div:not(:first-child) {
+				margin-top: 30px;
+			}
+		}
+	}
+	.site-title-inner .page-title {
+		@media (max-width: $screen-sm-min) {
+			.hidden-logo & {
+				margin: 0;
+			}
+		}
+	}
+	&.isStick {
+		> .container {
+			padding-left: 0;
+			padding-right: 0;
+		}
+		&.opened {
+			padding-top: 30px;
+			background: none;
+		}
+	}
+	&.opened {
+		> .container {
+			position: fixed;
+			width: 100%;
+			left: 50%;
+			padding-left: 70px;
+			padding-right: 70px;
+			@include transform(translate(-50%, 0));
+		}
+		.site-title-inner .page-title {
+			opacity: 0;
+			visibility: hidden;
+			@include transform(translate(0, -100%));
+		}
+	}
+}
+.site-title-inner {
+	.page-title {
+		text-align: center;
+		margin: 0;
+		opacity: 1;
+		line-height: 70px;
+		@include transform(translate(0, 0));
+		@include transition(all 200ms);
+
+		.hidden-logo & {
+			@media (max-width: $screen-sm-min) {
+				text-align: left;
+			}
+		}
+	}
+	.isStick & {
+		height: 0;
+		opacity: 0;
+		visibility: hidden;
+		@include transform(translate(0, -100%));
+	}
+}
+.row.hidden-logo {
+	.site-title-inner {
+		@media (max-width: $screen-sm-min) {
+			.page-title {
+				line-height: 70px;
+				height: 70px;
+				overflow: hidden;
+				white-space: nowrap;
+				text-overflow: ellipsis;
+			}
+			.isStick & {
+				height: auto;
+				opacity: 1;
+				visibility: visible;
+				@include transform(translate(0, 0));
+
+				.page-title {
+					padding-left: 20px;
+				}
+			}
+		}
+	}
+}
+
+// Hamburger 
+.static-header-logo {
+	.hamburger {
+		width: 70px;
+		height: 70px;
+		position: relative;
+		float: right;
+		@include transition(all 200ms);
+
+		.opened & {
+			background: white;
+		}
+		.lines {
+			width: 24px;
+			height: 2px;
+			background: white;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			@include transition(all 200ms);
+			@include transform(translate(-50%, -50%));
+
+			&:before,
+			&:after {
+				content: '';
+				width: inherit;
+				height: inherit;
+				background: inherit;
+				display: block;
+				position: absolute;
+				top: 0;
+				left: 0;
+				@include transition(all 300ms);
+				@include transform(translateY(-7px));
+			}
+			&:after {
+				@include transform(translateY(7px));
+			}
+			.opened & {
+				background: transparent;
+
+				&:before {
+					@include transform(translateY(0) rotate(45deg));
+				}
+				&:after {
+					@include transform(translateY(0) rotate(-45deg));
+
+					@media (min-height: 1500px) {
+						@include transform(translateY(-1px) rotate(-45deg));
+					}
+				}
+			}
+		}
+	}
+}
+
+// Header bottom area / Hamburger area
+#static-area-header-bottom {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: 10;
+	overflow: hidden;
+	
+	@include transform(translateY(-100%));
+	@include transition(all 200ms);
+
+	&:before {
+		content: '';
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		top: 0;
+		left: 0;
+		opacity: .9;
+	}
+	&.opened {
+		opacity: 1;
+		@include transform(translateY(0));
+	}
+	> .container {
+		padding: 20px 0;
+		max-width: 100%;
+		width: 100%;
+		height: 100%;
+	}
+	.row {
+		padding: 0 65px;
+
+		@media (max-width: $screen-sm-min) {
+			padding: 0;
+		}
+		> [class*='static'] {
+			margin: 12px 0;
+			text-align: center;
+			opacity: 0;
+			@include transition(all 500ms cubic-bezier(0.7, 0, 0.3, 1));
+			@include transform(translate3d(0, 500px ,0) scale3d(1, 0.5, 1));
+			-webkit-transform-origin: 50% 0;
+			transform-origin: 50% 0;
+			
+
+			&:nth-child(1) {
+				-webkit-transition-delay: 0.1s;
+				transition-delay: 0.1s;
+			}
+			&:nth-child(2) {
+				-webkit-transition-delay: 0.15s;
+				transition-delay: 0.15s;
+			}
+			&:nth-child(3) {
+				-webkit-transition-delay: 0.2s;
+				transition-delay: 0.2s;
+			}
+			&.align-left {
+				text-align: left;
+
+				@media (max-width: $screen-md-min) {
+					text-align: center;
+				}
+			}
+			&.align-right {
+				text-align: right;
+
+				@media (max-width: $screen-md-min) {
+					text-align: center;
+				}
+			}
+		}
+	}
+	&.opened {
+		.row {
+			> [class*='static'] {
+				opacity: 1;
+				@include transform(translate3d(0, 0 ,0) scale3d(1, 1, 1));
+			}
+		}
+	}
+	.static-header-sidebar {
+		font-weight: normal;
+		font-size: 16px;
+		line-height: 1.2em;
+
+		a {
+			color: #fff;
+			text-decoration: underline;
+		}
+	}
+}
+
+// Logo 
+.site-title {
+	margin: 0;
+
+	&.image-logo {
+		line-height: 1em;
+	}
+	&.text-logo {
+		a {
+			border: 2px solid;
+			padding: 0px 16px 0 15px;
+			display: inline-block;
+
+			.isStick & {
+				border-color: transparent;
+			}
+		}		
+	}
+	.description {
+		@include transition(all 300ms);
+	}
+}
+
+// Follow us
+.static-social-follow {
+	margin: 0;
+
+	.cherry-follow_title {
+		display: none;
+	}
+	.cherry-follow_wrap {
+		.cherry-follow_list {
+			.cherry-follow_item {
+				float: none;
+				display: inline-block;
+
+				a {
+					width: 32px;
+					height: 32px;
+					background: white;
+					border-radius: 0;
+
+					i {
+						@include transition(all 300ms);
+
+						&:before {
+							font-size: 16px;
+							line-height: 32px;
+						}
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,267 @@
+/*
+Description: The stylesheet with a main style.
+Author:      Cherry Team
+Version:     1.0.0
+*/
+@import "mixins";
+@import "extends";
+@import "css-framework/base";
+@import "header";
+@import "footer";
+@import "blog";
+@import "portfolio";
+@import "forms";
+@import "shortcodes";
+@import "menu";
+@import "slider";
+@import "typography";
+@import "widgets";
+
+/* #General
+================================================== */
+a,
+input,
+textarea {
+	@include transition(all 0.15s ease);
+}
+a:hover, 
+a:focus {
+	text-decoration: none;
+}
+*:focus {
+   outline: none
+}
+#site-wrapper {
+	padding: 30px;
+	overflow: hidden;
+}
+body {
+	&.opened {
+		overflow: hidden;
+		overflow-y: hidden;
+	}
+}
+
+/* Maintenance page
+================================================== */
+.maintenance-container{
+	text-align: center;
+
+	.site-branding {
+		padding: 40px 0 0;
+	}
+}
+
+/*isStick
+================================================== */
+.isStick{
+	&#menu-primary{
+		margin-top: 0;
+		margin-bottom: 0;
+		padding: 10px 0 0 ;
+		text-align: center;
+		margin-right: 0;
+		width: 100%;
+		left: 0;
+		z-index: 50;
+	}
+	&#static-area-header-top{
+		z-index: 100;
+	}
+	@media (max-width: 601px) {
+		top: 0 !important;
+	}
+}
+
+/* breadcrumbs
+================================================== */
+.cherry-breadcrumbs {
+	padding: 0;
+	text-align:center;
+	margin-bottom: 80px;
+	
+	.page-title {
+		margin:0 0 5px;
+	}
+	.cherry-breadcrumbs_content {
+		padding:10px 0;
+		text-align:center;
+		
+		.cherry-breadcrumbs_browse {
+			padding-right:15px;
+		}
+		.cherry-breadcrumbs_wrap {			
+			.cherry-breadcrumbs_item_sep {
+				margin:0 10px;
+			}
+		}
+	}
+}
+
+/* #Content
+================================================== */
+.site-content {
+	padding: 60px 0;
+	margin-top: 30px;
+	margin-bottom: 30px;
+}
+body {
+	&.bottom-padding {
+		.site-content {
+			padding-top: 0;
+		}
+	}
+	&.top-padding {
+		.site-content {
+			padding-bottom: 0;
+		}
+	}
+	&.no-padding {
+		.site-content {
+			padding-top: 0;
+			padding-bottom: 0;
+		}
+	}
+}
+body.page {
+	.hentry {
+		margin:0;
+	}
+	.entry-meta {
+		margin:0;
+	}
+	.entry-meta-top {
+		padding:0;
+		border:none;
+	}
+	.entry-content {
+		margin: 0;
+	}
+}
+.entry-content {
+	> .row {
+		.two-sidebars & {
+			@media only screen and (min-width: $screen-md-min - 1) {
+				margin-left: 0;
+				margin-right: 0;
+			}
+		}
+	}
+	.col-lg-1,
+	.col-lg-2,
+	.col-lg-3,
+	.col-lg-4 {
+		.two-sidebars & {
+			@media only screen and (min-width: $screen-md-min - 1) {
+				float: none;
+				width: 100%;
+
+				& + div[class*="col-"] {
+					float: none;
+					width: 100%;
+				}
+			}
+		}
+	}
+}
+.row {
+	&.paddings {
+		> .cherry-box > .inner,
+		> [class*='col-lg'] {
+			padding: 80px 60px;
+
+			.two-sidebars & {
+				padding: 30px 20px;
+			}
+			@media (max-width: $screen-sm-min) {
+				padding: 30px 20px;
+			}
+		}
+		> .cherry-box > .inner {
+			[class*='col-lg'] {
+				padding-left: 35px;
+				padding-right: 35px;
+
+				@media (max-width: $screen-sm-min) {
+					padding-left: 10px;
+					padding-right: 10px;
+				}
+				.two-sidebars & {
+					padding-left: 10px;
+					padding-right: 10px;
+				}
+			}
+		}
+	}
+}
+
+
+/* Back to Top
+================================================== */
+
+#back-top {
+	@include transition(all 0.15s ease);
+	
+	position: fixed;
+	visibility:hidden;
+	margin:0 30px 30px 0;
+	right: 0;
+	bottom: -100px;
+	overflow: hidden;
+	z-index: 100;
+
+	a {
+		display: block;
+		border-radius:0;
+		width: 70px;
+		height: 70px;
+		text-align: center;
+		text-decoration: none;
+		color:#fff;
+		
+		&:before,
+		&:after {
+			content: '';
+			width: 24px;
+			height: 2px;
+			background: white;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			margin-top: -10px;
+			transform-origin: 0 100%;
+			@include transition(all 500ms);
+			@include transform(rotate(45deg));
+		}
+		&:after {
+			width: 25px;
+			@include transform(rotate(-225deg) translate(-1px, 0px));
+		}
+	}
+	
+	&.show-totop {
+		visibility:visible;
+		bottom: 0px;
+	}
+	&.mobile-back-top {
+		@include scale(.7);
+		
+		margin:0 2px 1px 0;
+	}
+}
+
+/* Privacy
+================================================== */
+h3 {
+	em {
+		position: relative;
+		display: inline-block;
+		width: 40px;
+		height: 40px;
+		text-align: center;
+		border: 1px solid;
+		line-height: 40px;
+		margin-right: 10px;
+		font-style: normal;
+	}
+}

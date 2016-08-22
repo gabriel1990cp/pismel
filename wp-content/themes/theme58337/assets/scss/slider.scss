@@ -1,0 +1,116 @@
+/*
+Description: The stylesheet with a motopress style.
+Author:      Cherry Team
+Version:     1.0.0
+*/
+
+.static-moto-slider {
+	padding-left: 0;
+	padding-right: 0;
+
+	@media (max-width: $screen-lg-min) {
+		top: 0 !important;
+		margin-bottom: 0 !important;
+		padding-top: 30px;
+	}
+	@media (max-height: 850px) {
+		top: 0 !important;
+		margin-bottom: 0 !important;
+		padding-top: 30px;
+	}
+	@media (max-width: $screen-sm-min) {
+		padding-left: 15px;
+		padding-right: 15px;
+	}
+}
+.motoslider_wrapper {
+	&.full-height {
+		@media (max-width: $screen-lg-min) {
+			height: auto !important;
+		}
+		@media (max-height: 700px) {
+			height: auto !important;
+		}
+		> div {
+			@media only screen and (min-width: $screen-lg-min + 1) and (min-height: 700px) {
+				height: 100% !important;
+				max-height: 100% !important;
+			}
+		}
+	}
+	.ms_pagination {
+		bottom: 0;
+		background: white;
+		padding: 3px 0 0;
+
+		.ms_bullet_wrapper {
+			width: 100%;
+
+			display: -ms-flexbox;
+			display: -webkit-flex;
+			display: flex;
+			-webkit-flex-direction: row;
+			-ms-flex-direction: row;
+			flex-direction: row;
+			-webkit-flex-wrap: nowrap;
+			-ms-flex-wrap: nowrap;
+			flex-wrap: nowrap;
+			-webkit-justify-content: center;
+			-ms-flex-pack: center;
+			justify-content: center;
+			-webkit-align-content: stretch;
+			-ms-flex-line-pack: stretch;
+			align-content: stretch;
+			-webkit-align-items: flex-start;
+			-ms-flex-align: start;
+			align-items: flex-start;
+		}
+		.ms_bullet {
+			margin: 0 0 0 3px;
+			width: 50px;
+			height: 5px;
+			border-radius: 0;
+			opacity: 1;
+			background: #e1e1e1;
+			-webkit-flex: 1 1 auto;
+			-ms-flex: 1 1 auto;
+			flex: 1 1 auto;
+			-webkit-align-self: auto;
+			-ms-flex-item-align: auto;
+			align-self: auto;
+
+			&:first-child {
+				margin: 0;
+			}
+			&.ms_active,
+			&:hover {
+				background: #accee5;
+			}
+			&.ms_active {
+				cursor: default;
+			}
+		}
+	}
+	.ms_banner_timer {
+		display: none !important;
+	}
+}
+
+.timer-bullet {
+	height: 5px;
+	width: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	overflow: hidden;
+
+	.timer {
+		position: absolute;
+		height: 100%;
+		opacity: 1;
+
+		&.invisible {
+			opacity: 0;
+		}
+	}
+}

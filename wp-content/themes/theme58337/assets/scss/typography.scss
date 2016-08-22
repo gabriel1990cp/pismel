@@ -1,0 +1,120 @@
+/*
+Description: The stylesheet with a typography style.
+Author:      Cherry Team
+Version:     1.0.0
+*/
+
+h1,
+h2 {
+	margin: 0 0 1.7rem;
+}
+h3 {
+	margin: 0 0 1.6rem;
+}
+h4 {
+	margin: 0 0 1.5rem;
+}
+h5,
+h6,
+p {
+	margin: 0 0 1.4rem;
+}
+.motopress-clmn {
+	> :not(.row) {
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+}
+.row {
+	> [class*="col-"] {
+		> h1,
+		> h2,
+		> h3,
+		> h4,
+		> h5,
+		> h6,
+		> p {
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+}
+.motopress-text-obj,
+.motopress-code-obj {
+	> *:last-child {
+		margin-bottom: 0;
+	}
+}
+.entry-content {
+	margin: 0;
+
+	> p:last-child {
+		margin-bottom: 0;
+	}
+}
+.motopress-text-obj,
+.motopress-code-obj,
+.textwidget {
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		font-weight: normal;
+	}
+}
+.motopress-text-obj,
+.motopress-code-obj {
+	span[style*='font-size: '] {
+		line-height: 1.4375em;
+		display: inline-block;
+	}
+	a {
+		text-decoration: underline;
+	}
+}
+.two-sidebars {
+	.site-content {
+		@media only screen and (min-width: $screen-md-min - 1) {
+			.search-form .search-submit,
+			.cherry-btn,
+			.btn,
+			input[type="submit"],
+			input[type="reset"] {
+				padding: 10px;
+				font-size: 1rem;
+				line-height: 1.2em;
+				height: auto;
+			}
+			h1,
+			h2,
+			h3,
+			h4,
+			h5,
+			h6 {
+				line-height: 1.2em;
+			}
+			h1 {
+				font-size: 1.6rem;
+			}
+			h2 {
+				font-size: 1.5rem;
+			}
+			h3 {
+				font-size: 1.4rem;
+			}
+			h4 {
+				font-size: 1.3rem;
+			}
+			h5 {
+				font-size: 1.2rem;
+			}
+			h6 {
+				font-size: 1.1rem;
+			}
+		}
+	}
+}

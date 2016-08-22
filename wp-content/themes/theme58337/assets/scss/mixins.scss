@@ -1,0 +1,31 @@
+@mixin transition($trsn) {
+	transition: $trsn;
+}
+@mixin transition-delay($trsn-d) {
+	-webkit-transition-delay: $trsn-d;
+	transition-delay: $trsn-d;
+}
+@mixin animation($anim) {
+	-webkit-animation: $anim;
+	animation: $anim;
+}
+@mixin transform-origin($trfm-o) {
+	-webkit-transform-origin: $trfm-o;
+	transform-origin: $trfm-o;
+}
+@mixin transform($trfm) {
+	-webkit-transform: $trfm;
+	transform: $trfm;
+}
+@mixin rotate($deg) {
+	@include transform(rotate(#{$deg}deg));
+}
+@mixin scale($scale) {
+	@include transform(scale($scale));
+}
+@mixin translate($x, $y) {
+	@include transform(translate($x, $y));
+}
+@mixin skew($x, $y) {
+	@include transform(skew(#{$x}deg, #{$y}deg));
+}
